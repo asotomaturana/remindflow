@@ -318,6 +318,10 @@ code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:11px
     <div class="ctitle">Mensajes recientes</div>
     <div id="dashRecent" class="empty">Cargando...</div>
   </div>
+  <div class="card" style="margin-top:14px;">
+    <div class="ctitle">Última publicación registrada</div>
+    <div id="dashUltimaPublicacion" class="empty">Cargando...</div>
+  </div>
 </div>
 
 <!-- ══ CLIENTES ══ -->
@@ -1799,11 +1803,16 @@ async function loadSeguimiento(){
 // ── DASHBOARD ───────────────────────────────────────────────
 async function refreshDash(){
   try{
-    const [summary,history,allContenido]=await Promise.all([
+    const mesActual = new Date();
+    mesActual.setDate(1); mesActual.setHours(0,0,0,0);
+    const fromMes = mesActual.toISOString();
+    const [summary,history,allContenido,pubResumenMes]=await Promise.all([
       apiFetch('/api/summary'),
       apiFetch('/api/messages/history'),
       apiFetch('/api/contenido'),
+      apiFetch('/api/publicaciones/resumen?from=' + encodeURIComponent(fromMes)),
     ]);
+    const pubMes = pubResumenMes.total || 0;
     localHistory=history;
     localContenido=allContenido;
 
@@ -1814,6 +1823,7 @@ async function refreshDash(){
       <div class="stat"><div class="stat-num" style="color:var(--amber)">${summary.pendingContenido}</div><div class="stat-label">Contenido pendiente</div></div>
       <div class="stat"><div class="stat-num" style="color:var(--red)">${summary.activeAcuerdos}</div><div class="stat-label">Acuerdos activos</div></div>
       <div class="stat"><div class="stat-num" style="color:var(--muted)">${summary.scheduledPending}</div><div class="stat-label">Envíos programados</div></div>
+      <div class="stat"><div class="stat-num" style="color:#9b59b6">${pubMes}</div><div class="stat-label">Publicaciones este mes</div></div>
     `;
 
     const activeClients=localClients.filter(c=>localAcuerdos.find(a=>a.clientId===c.id));
@@ -1852,6 +1862,27 @@ async function refreshDash(){
         ${h.replied?'<span class="replied-badge rb-yes">✓ Resp.</span>':''}
       </div>`;
     }).join('')||'<div class="empty">Sin mensajes recientes.</div>';
+
+    // Última publicación
+    const ultima = pubResumenMes.ultimaPublicacion;
+    const elUltima = document.getElementById('dashUltimaPublicacion');
+    if (elUltima) {
+      if (ultima) {
+        const cl = localClients.find(x => x.id === ultima.clientId);
+        const fecha = ultima.publishedAt ? ultima.publishedAt.substring(0,16).replace('T',' ') : '—';
+        const iconMap = {instagram:'📸',facebook:'👤',tiktok:'🎵',youtube:'▶️',otro:'🌐'};
+        elUltima.innerHTML = `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
+          <div style="font-size:24px;">${iconMap[ultima.platform]||'🌐'}</div>
+          <div>
+            <div style="font-size:13px;font-weight:600;">${ultima.contentType} en ${ultima.platform}</div>
+            <div style="font-size:11px;color:var(--muted);">${cl?cl.name:'—'} · ${fecha}</div>
+            ${ultima.url ? `<a href="${ultima.url}" target="_blank" style="font-size:11px;color:var(--accent);">Ver post ↗</a>` : ''}
+          </div>
+        </div>`;
+      } else {
+        elUltima.innerHTML = '<div class="empty" style="padding:14px;">Sin publicaciones registradas aún.</div>';
+      }
+    }
 
   }catch(e){
     document.getElementById('dashStats').innerHTML=`<div class="empty" style="grid-column:1/-1;">${e.message}</div>`;
