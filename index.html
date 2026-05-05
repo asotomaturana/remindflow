@@ -1,0 +1,2896 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>RemindFlow v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0e0f14;--surface:#16181f;--surface2:#1e2029;--surface3:#252730;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --accent:#7c6ff7;--accent-dim:rgba(124,111,247,0.14);
+  --green:#25d366;--green-dim:rgba(37,211,102,0.12);
+  --red:#ea4335;--red-dim:rgba(234,67,53,0.12);
+  --amber:#f59e0b;--amber-dim:rgba(245,158,11,0.12);
+  --blue:#378add;--blue-dim:rgba(55,138,221,0.12);
+  --pink:#e1306c;--pink-dim:rgba(225,48,108,0.12);
+  --muted:#8a8b9a;--text:#f0f0f4;--r:10px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* LAYOUT */
+header{display:flex;align-items:center;justify-content:space-between;padding:13px 22px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:50;}
+header h1{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:.02em;}
+header h1 span{color:var(--accent);}
+.hbadge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:500;}
+.hbadge.ok{background:var(--green-dim);color:var(--green);}
+.hbadge.err{background:var(--red-dim);color:var(--red);}
+.hbadge.chk{background:rgba(255,255,255,.06);color:var(--muted);}
+.layout{display:flex;min-height:calc(100vh - 50px);}
+nav{width:200px;flex-shrink:0;background:var(--surface);border-right:1px solid var(--border);padding:14px 9px;display:flex;flex-direction:column;gap:2px;position:sticky;top:50px;height:calc(100vh - 50px);overflow-y:auto;}
+.nb{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:9px 12px;border-radius:8px;cursor:pointer;text-align:left;transition:.15s;display:flex;align-items:center;gap:9px;width:100%;}
+.nb:hover{color:var(--text);background:rgba(255,255,255,.04);}
+.nb.active{color:var(--text);background:var(--accent-dim);}
+.nb .ico{font-size:14px;width:18px;text-align:center;flex-shrink:0;}
+.ndiv{height:1px;background:var(--border);margin:5px 0;}
+.nlabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;padding:8px 12px 3px;font-weight:600;}
+.main{flex:1;padding:22px 26px;overflow-y:auto;max-width:1100px;}
+
+/* SECTIONS */
+.sec{display:none;}.sec.active{display:block;}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;gap:12px;flex-wrap:wrap;}
+.ptitle{font-family:'Syne',sans-serif;font-size:19px;font-weight:700;}
+.psub{font-size:12px;color:var(--muted);margin-top:3px;}
+
+/* BUTTONS */
+.btn{background:var(--accent);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:8px 16px;border-radius:var(--r);cursor:pointer;transition:.15s;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
+.btn:hover{opacity:.85;}.btn:disabled{opacity:.4;cursor:not-allowed;}
+.btn.sec{background:var(--surface2);color:var(--muted);border:1px solid var(--border);}
+.btn.sec:hover{color:var(--text);}
+.btn.grn{background:#1a6b3c;color:var(--green);}
+.btn.danger{background:#5a1a1a;color:var(--red);}
+.btn.sm{padding:5px 11px;font-size:11px;}
+.btn.xs{padding:4px 8px;font-size:10px;}
+.btn.loading::after{content:' ...';opacity:.6;}
+.brow{display:flex;gap:7px;flex-wrap:wrap;}
+
+/* FORMS */
+lbl,label{display:block;font-size:10px;color:var(--muted);margin-bottom:4px;margin-top:11px;text-transform:uppercase;letter-spacing:.06em;}
+label:first-child{margin-top:0;}
+input[type=text],input[type=email],input[type=password],input[type=datetime-local],input[type=date],input[type=number],input[type=url],select,textarea{
+  width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:12px;border-radius:7px;padding:8px 10px;outline:none;transition:.15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+textarea{resize:vertical;min-height:72px;}
+select option{background:#16181f;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px;}
+.frow4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:11px;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:18px;}
+.card.hover:hover{border-color:rgba(124,111,247,.25);}
+.ctitle{font-family:'Syne',sans-serif;font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:18px;}
+.stat{background:var(--surface2);border-radius:10px;padding:14px;text-align:center;}
+.stat-num{font-family:'Syne',sans-serif;font-size:26px;font-weight:700;line-height:1;}
+.stat-label{font-size:11px;color:var(--muted);margin-top:5px;}
+
+/* CLIENT GRID */
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:11px;}
+.ccard{background:var(--surface);border:1px solid var(--border);border-radius:13px;padding:16px;transition:.15s;cursor:default;}
+.ccard:hover{border-color:rgba(124,111,247,.3);}
+.cavatar{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;margin-bottom:9px;}
+.cname{font-size:13px;font-weight:500;margin-bottom:2px;}
+.cmeta{font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.55;}
+.cactions{display:flex;gap:5px;flex-wrap:wrap;}
+.snet-badges{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
+.snet{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;}
+.sn-wa{background:var(--green-dim);color:var(--green);}
+.sn-ig{background:var(--pink-dim);color:var(--pink);}
+.sn-fb{background:var(--blue-dim);color:var(--blue);}
+.sn-tt{background:rgba(0,0,0,.3);color:#e2e2e2;border:1px solid rgba(255,255,255,.1);}
+
+/* TASK / FLOW LIST */
+.tlist{display:flex;flex-direction:column;gap:7px;}
+.titem{background:var(--surface);border:1px solid var(--border);border-radius:11px;padding:13px 16px;display:flex;align-items:center;gap:12px;}
+.ticon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.tinfo{flex:1;min-width:0;}
+.tname{font-size:12px;font-weight:500;margin-bottom:2px;}
+.tmeta{font-size:10px;color:var(--muted);}
+.tst{font-size:10px;font-weight:600;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;flex-shrink:0;}
+.st-agreed{background:var(--blue-dim);color:var(--blue);}
+.st-reminded{background:var(--amber-dim);color:var(--amber);}
+.st-replied{background:var(--accent-dim);color:var(--accent);}
+.st-inprod{background:rgba(251,191,36,.2);color:#fbbf24;}
+.st-delivered{background:var(--green-dim);color:var(--green);}
+.st-published{background:rgba(37,211,102,.25);color:#16a34a;}
+.st-overdue{background:var(--red-dim);color:var(--red);}
+.st-pending{background:rgba(255,255,255,.07);color:var(--muted);}
+
+/* SEND */
+.stabs{display:flex;gap:3px;margin-bottom:16px;background:var(--surface2);padding:4px;border-radius:10px;width:fit-content;}
+.stab{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:6px 15px;border-radius:7px;cursor:pointer;transition:.15s;display:flex;align-items:center;gap:6px;}
+.stab.active{background:var(--surface);color:var(--text);}
+.stab:hover:not(.active){color:var(--text);}
+.spanel{display:none;}.spanel.active{display:block;}
+.scardtitle{display:flex;align-items:center;gap:8px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;margin-bottom:16px;}
+.chico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.tplbtns{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.tplbtn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 10px;border-radius:20px;cursor:pointer;transition:.15s;}
+.tplbtn:hover{color:var(--text);border-color:var(--accent);}
+
+/* CONTENT TYPE */
+.ctgrid{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
+.ctbtn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:11px;padding:6px 12px;border-radius:8px;cursor:pointer;transition:.15s;}
+.ctbtn:hover,.ctbtn.sel{background:var(--accent-dim);border-color:var(--accent);color:var(--text);}
+
+/* RECURRENCE */
+.recgrid{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.recbtn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;padding:4px 11px;border-radius:20px;cursor:pointer;transition:.15s;}
+.recbtn:hover,.recbtn.sel{background:var(--accent-dim);border-color:var(--accent);color:var(--text);}
+.reccustom{display:none;margin-top:8px;}
+.reccustom.show{display:block;}
+.dowgrid{display:flex;gap:5px;flex-wrap:wrap;margin-top:5px;}
+.dowbtn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;padding:4px 10px;border-radius:20px;cursor:pointer;transition:.15s;}
+.dowbtn.sel{background:var(--accent-dim);border-color:var(--accent);color:var(--text);}
+
+/* HISTORY */
+.hlist{display:flex;flex-direction:column;gap:7px;}
+.hitem{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 16px;display:flex;align-items:center;gap:12px;}
+.hch{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.hinfo{flex:1;min-width:0;}
+.hmain{font-size:12px;font-weight:500;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.hsub{font-size:10px;color:var(--muted);}
+.htime{font-size:10px;color:var(--muted);white-space:nowrap;}
+.replied-badge{font-size:9px;padding:2px 7px;border-radius:20px;font-weight:500;margin-left:6px;}
+.rb-yes{background:var(--green-dim);color:var(--green);}
+.rb-no{background:rgba(255,255,255,.05);color:var(--muted);}
+
+/* CALENDAR */
+.calh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.calnav{display:flex;align-items:center;gap:10px;}
+.calmonth{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;}
+.calgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.caldow{font-size:10px;color:var(--muted);text-align:center;padding:3px 0;text-transform:uppercase;letter-spacing:.05em;}
+.calday{min-height:72px;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:7px;cursor:pointer;transition:.15s;}
+.calday:hover{border-color:rgba(124,111,247,.3);}
+.calday.today{border-color:var(--accent);}
+.calday.otherm{opacity:.3;}
+.daynum{font-size:11px;font-weight:500;margin-bottom:3px;}
+.calday.today .daynum{color:var(--accent);}
+.cev{font-size:9px;padding:2px 4px;border-radius:3px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500;}
+.ev-gmail{background:var(--red-dim);color:var(--red);}
+.ev-wa{background:var(--green-dim);color:var(--green);}
+.ev-sched{background:var(--amber-dim);color:var(--amber);}
+
+/* CLIENT DETAIL */
+.detail-tabs{display:flex;gap:3px;margin-bottom:18px;background:var(--surface2);padding:4px;border-radius:10px;}
+.dtab{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;padding:7px 16px;border-radius:7px;cursor:pointer;transition:.15s;}
+.dtab.active{background:var(--surface);color:var(--text);}
+.dtab:hover:not(.active){color:var(--text);}
+.dpanel{display:none;}.dpanel.active{display:block;}
+.snet-section{background:var(--surface2);border-radius:10px;padding:14px;margin-bottom:10px;}
+.snet-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.snet-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.snet-name{font-size:12px;font-weight:500;}
+.content-row{display:flex;align-items:center;gap:10px;padding:10px;background:var(--surface);border:1px solid var(--border);border-radius:9px;margin-bottom:6px;}
+.cr-info{flex:1;min-width:0;}
+.cr-name{font-size:12px;font-weight:500;margin-bottom:1px;}
+.cr-meta{font-size:10px;color:var(--muted);}
+.progress-bar{height:4px;background:var(--border2);border-radius:2px;margin-top:6px;}
+.progress-fill{height:100%;border-radius:2px;background:var(--accent);transition:.3s;}
+
+/* MODALS */
+.moverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:200;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto;}
+.moverlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:15px;padding:24px;width:520px;max-width:100%;margin:auto;}
+.modal.lg{width:680px;}
+.modal.xl{width:820px;}
+.modal h2{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:16px;}
+.mact{display:flex;gap:7px;justify-content:flex-end;margin-top:18px;}
+
+/* SCHEDULED */
+.schlist{display:flex;flex-direction:column;gap:7px;}
+.schi{background:var(--surface);border:1px solid rgba(245,158,11,.2);border-radius:10px;padding:12px 16px;display:flex;align-items:flex-start;gap:12px;}
+.schinfo{flex:1;min-width:0;}
+.schmain{font-size:12px;font-weight:500;margin-bottom:2px;}
+.schsub{font-size:10px;color:var(--muted);line-height:1.5;}
+.recbadge{font-size:9px;padding:2px 7px;border-radius:20px;background:var(--amber-dim);color:var(--amber);font-weight:500;display:inline-block;margin-top:3px;}
+
+/* MISC */
+.divider{height:1px;background:var(--border);margin:14px 0;}
+.empty{color:var(--muted);font-size:12px;text-align:center;padding:28px;}
+.pill{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;display:inline-block;}
+.pa{background:var(--accent-dim);color:var(--accent);}
+.pg{background:var(--green-dim);color:var(--green);}
+.pr{background:var(--red-dim);color:var(--red);}
+.pam{background:var(--amber-dim);color:var(--amber);}
+.pb{background:var(--blue-dim);color:var(--blue);}
+code{background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:11px;}
+.toast{position:fixed;bottom:22px;right:22px;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-size:12px;padding:11px 16px;border-radius:10px;opacity:0;transform:translateY(8px);transition:.3s;pointer-events:none;z-index:400;max-width:320px;}
+.toast.show{opacity:1;transform:translateY(0);}
+.toast.ok{border-color:rgba(37,211,102,.4);}
+.toast.err{border-color:rgba(234,67,53,.4);}
+@media(max-width:680px){nav{display:none;}.main{padding:14px;}.frow,.frow3,.frow4{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<style>
+#loginOverlay{position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:var(--bg);}
+#loginOverlay.hidden{display:none;}
+.login-card{background:var(--surface);border:1px solid var(--border);border-radius:18px;padding:40px 36px;width:360px;max-width:95vw;}
+.login-logo{font-family:'Syne',sans-serif;font-size:28px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.login-logo span{color:var(--accent);}
+.login-sub{font-size:12px;color:var(--muted);margin-bottom:28px;}
+.login-err{font-size:12px;color:var(--red);margin-bottom:10px;min-height:18px;}
+.login-field{margin-bottom:14px;}
+.login-field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:5px;}
+.login-field input{width:100%;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;border-radius:8px;padding:10px 12px;outline:none;transition:.15s;}
+.login-field input:focus{border-color:var(--accent);}
+.login-btn{width:100%;background:var(--accent);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:11px;border-radius:10px;cursor:pointer;transition:.18s;margin-top:6px;}
+.login-btn:hover{opacity:.88;}.login-btn:disabled{opacity:.5;cursor:not-allowed;}
+.login-footer{font-size:10px;color:var(--muted);text-align:center;margin-top:20px;}
+.user-chip{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted);}
+.user-chip span{font-size:13px;}
+.logout-btn{background:none;border:1px solid var(--border);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:10px;padding:3px 9px;border-radius:6px;cursor:pointer;transition:.15s;}
+.logout-btn:hover{color:var(--text);}
+</style>
+
+<!-- ══ LOGIN OVERLAY ══ -->
+<div id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">Remind<span>Flow</span></div>
+    <div class="login-sub">Sistema de gestión para community managers</div>
+    <div class="login-err" id="loginErr"></div>
+    <div class="login-field">
+      <label>Usuario</label>
+      <input type="text" id="loginUser" placeholder="admin" autocomplete="username" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="login-field">
+      <label>Contraseña</label>
+      <input type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Iniciar sesión</button>
+    <div class="login-footer">RemindFlow v4.3.0 — Acceso restringido</div>
+  </div>
+</div>
+
+  <h1>Remind<span>Flow</span> <span style="font-size:10px;color:var(--muted);font-weight:400;">v4.0</span></h1>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span class="hbadge chk" id="svcBadge">verificando...</span>
+    <div class="user-chip"><span>👤</span><span id="headerUser"></span><button class="logout-btn" onclick="doLogout()">Salir</button></div>
+  </div>
+</header>
+
+<div class="layout">
+<nav>
+  <span class="nlabel">General</span>
+  <button class="nb active" onclick="ST('dashboard')"><span class="ico">📊</span>Dashboard</button>
+  <button class="nb" onclick="ST('clientes')"><span class="ico">👥</span>Clientes</button>
+  <button class="nb" onclick="ST('seguimiento')"><span class="ico">📋</span>Seguimiento</button>
+  <div class="ndiv"></div>
+  <span class="nlabel">Mensajes</span>
+  <button class="nb" onclick="ST('enviar')"><span class="ico">📨</span>Enviar</button>
+  <button class="nb" onclick="ST('programados')"><span class="ico">📅</span>Programados</button>
+  <button class="nb" onclick="ST('historial')"><span class="ico">🕓</span>Historial</button>
+  <button class="nb" onclick="ST('calendario')"><span class="ico">🗓</span>Calendario</button>
+  <div class="ndiv"></div>
+  <span class="nlabel">Contenido</span>
+  <button class="nb" onclick="ST('acuerdos')"><span class="ico">🤝</span>Acuerdos</button>
+  <button class="nb" onclick="ST('contenido')"><span class="ico">🎬</span>Contenido</button>
+  <div class="ndiv"></div>
+  <button class="nb" onclick="ST('propuestas')"><span class="ico">📋</span>Propuestas</button>
+  <button class="nb" onclick="ST('materiales')"><span class="ico">📁</span>Materiales</button>
+  <button class="nb" onclick="ST('respuestas')"><span class="ico">💬</span>Respuestas</button>
+  <button class="nb" onclick="ST('auditlog')"><span class="ico">🔍</span>Auditoría</button>
+  <div class="ndiv"></div>
+  <span class="nlabel">Reportes</span>
+  <button class="nb" onclick="ST('credenciales')"><span class="ico">🔐</span>Credenciales</button>
+  <button class="nb" onclick="ST('estadisticas')"><span class="ico">📈</span>Estadísticas</button>
+  <button class="nb" onclick="ST('publicaciones')"><span class="ico">🗂️</span>Publicaciones</button>
+  <div class="ndiv"></div>
+</nav>
+
+<div class="main">
+
+<!-- ══ DASHBOARD ══ -->
+<div id="sec-dashboard" class="sec active">
+  <div class="topbar">
+    <div><div class="ptitle">Dashboard</div><div class="psub">Resumen general del sistema</div></div>
+    <button class="btn sec sm" onclick="refreshDash()">↻ Actualizar</button>
+  </div>
+  <div class="stats-row" id="dashStats"></div>
+  <div class="frow" style="gap:14px;">
+    <div>
+      <div class="card"><div class="ctitle">Clientes con acuerdo activo</div><div id="dashActiveClients" class="empty">Cargando...</div></div>
+    </div>
+    <div>
+      <div class="card"><div class="ctitle">Contenido pendiente de entrega</div><div id="dashPendingContent" class="empty">Cargando...</div></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:14px;">
+    <div class="ctitle">Mensajes recientes</div>
+    <div id="dashRecent" class="empty">Cargando...</div>
+  </div>
+</div>
+
+<!-- ══ CLIENTES ══ -->
+<div id="sec-clientes" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Clientes</div><div class="psub">Gestión completa con perfiles de redes sociales</div></div>
+    <button class="btn" onclick="openAddClient()">+ Nuevo cliente</button>
+  </div>
+  <div class="cgrid" id="clientGrid"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ SEGUIMIENTO ══ -->
+<div id="sec-seguimiento" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Seguimiento general</div><div class="psub">Estado de todos los clientes y sus flujos de contenido</div></div>
+    <button class="btn sec sm" onclick="loadSeguimiento()">↻ Actualizar</button>
+  </div>
+  <div id="seguimientoList" class="empty">Cargando...</div>
+</div>
+
+<!-- ══ ENVIAR ══ -->
+<div id="sec-enviar" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Enviar recordatorio</div><div class="psub">Gmail y WhatsApp</div></div>
+  </div>
+
+  <!-- Content metadata -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="ctitle">Información del contenido a recordar</div>
+    <div class="frow">
+      <div>
+        <label>Tipo de contenido</label>
+        <div class="ctgrid">
+          <button class="ctbtn" data-val="Foto" onclick="selCT(this)">📷 Foto</button>
+          <button class="ctbtn" data-val="Video" onclick="selCT(this)">🎬 Video</button>
+          <button class="ctbtn" data-val="Reel" onclick="selCT(this)">🎞 Reel</button>
+          <button class="ctbtn" data-val="Historia" onclick="selCT(this)">⏱ Historia</button>
+          <button class="ctbtn" data-val="Texto" onclick="selCT(this)">📝 Texto</button>
+          <button class="ctbtn" data-val="Otro" onclick="selCT(this)">✨ Otro</button>
+        </div>
+      </div>
+      <div>
+        <label>Nombre del contenido</label>
+        <select id="contentName">
+          <option value="">— Predefinido —</option>
+          <option>Receta semanal</option><option>Tip de nutrición</option>
+          <option>Unboxing</option><option>Promoción</option>
+          <option>Testimonio</option><option>Detrás de cámaras</option>
+          <option>Anuncio</option><option>Tutorial</option><option>FAQ</option>
+        </select>
+        <input type="text" id="contentNameCustom" placeholder="O escribe un nombre personalizado..." style="margin-top:6px;"/>
+        <label>Red social destino</label>
+        <select id="contentPlatform">
+          <option value="">— Todas —</option>
+          <option>Instagram</option><option>Facebook</option>
+          <option>TikTok</option><option>YouTube</option><option>Otra</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Channel tabs -->
+  <div class="stabs">
+    <button class="stab active" onclick="SST('gmail')">✉️ Gmail</button>
+    <button class="stab" onclick="SST('wa')">💬 WhatsApp</button>
+  </div>
+
+  <!-- Gmail -->
+  <div id="sp-gmail" class="spanel active">
+    <div class="card">
+      <div class="scardtitle"><div class="chico" style="background:var(--red-dim)">✉️</div>Gmail</div>
+      <label>Cliente</label><select id="gmail-client"></select>
+      <label>Asunto</label><input type="text" id="gmail-subject" placeholder="Se genera automáticamente con las plantillas"/>
+      <label>Plantilla rápida</label>
+      <div class="tplbtns">
+        <button class="tplbtn" onclick="setTpl('gmail','create')">📹 Crear contenido</button>
+        <button class="tplbtn" onclick="setTpl('gmail','send')">📤 Enviar contenido</button>
+        <button class="tplbtn" onclick="setTpl('gmail','desc')">📝 Descripción</button>
+        <button class="tplbtn" onclick="setTpl('gmail','approve')">✅ Aprobación</button>
+        <button class="tplbtn" onclick="setTpl('gmail','followup')">🔁 Seguimiento</button>
+      </div>
+      <label>Mensaje</label>
+      <textarea id="gmail-body" placeholder="Escribe o selecciona una plantilla..."></textarea>
+      <div class="divider"></div>
+      <div class="ctitle">Programar envío</div>
+      <div class="frow">
+        <div><label>Fecha y hora</label><input type="datetime-local" id="gmail-schedule"/></div>
+        <div>
+          <label>Repetición</label>
+          <div class="recgrid" id="gmail-recgrid">
+            <button class="recbtn sel" data-val="none" onclick="selRec('gmail',this)">Sin repetir</button>
+            <button class="recbtn" data-val="daily" onclick="selRec('gmail',this)">Diario</button>
+            <button class="recbtn" data-val="weekdays" onclick="selRec('gmail',this)">Lun–Vie</button>
+            <button class="recbtn" data-val="weekends" onclick="selRec('gmail',this)">Fin de semana</button>
+            <button class="recbtn" data-val="weekly" onclick="selRec('gmail',this)">Semanal</button>
+            <button class="recbtn" data-val="custom" onclick="selRec('gmail',this)">Personalizado</button>
+          </div>
+          <div class="reccustom" id="gmail-customdays">
+            <label>Días</label>
+            <div class="dowgrid">
+              <button class="dowbtn" data-day="1" onclick="togDow(this)">Lun</button>
+              <button class="dowbtn" data-day="2" onclick="togDow(this)">Mar</button>
+              <button class="dowbtn" data-day="3" onclick="togDow(this)">Mié</button>
+              <button class="dowbtn" data-day="4" onclick="togDow(this)">Jue</button>
+              <button class="dowbtn" data-day="5" onclick="togDow(this)">Vie</button>
+              <button class="dowbtn" data-day="6" onclick="togDow(this)">Sáb</button>
+              <button class="dowbtn" data-day="0" onclick="togDow(this)">Dom</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn" id="btnGmail" style="width:100%;margin-top:12px" onclick="doSend('gmail')">Enviar / Programar por Gmail</button>
+    </div>
+  </div>
+
+  <!-- WhatsApp -->
+  <div id="sp-wa" class="spanel">
+    <div class="card">
+      <div class="scardtitle"><div class="chico" style="background:var(--green-dim)">💬</div>WhatsApp (Twilio)</div>
+      <label>Cliente</label><select id="wa-client"></select>
+      <label>Plantilla rápida</label>
+      <div class="tplbtns">
+        <button class="tplbtn" onclick="setTpl('wa','create')">📹 Crear contenido</button>
+        <button class="tplbtn" onclick="setTpl('wa','send')">📤 Enviar contenido</button>
+        <button class="tplbtn" onclick="setTpl('wa','desc')">📝 Descripción</button>
+        <button class="tplbtn" onclick="setTpl('wa','approve')">✅ Aprobación</button>
+        <button class="tplbtn" onclick="setTpl('wa','followup')">🔁 Seguimiento</button>
+      </div>
+      <label>Mensaje</label>
+      <textarea id="wa-body" placeholder="Escribe o selecciona una plantilla..."></textarea>
+      <div class="divider"></div>
+      <div class="ctitle">Programar envío</div>
+      <div class="frow">
+        <div><label>Fecha y hora</label><input type="datetime-local" id="wa-schedule"/></div>
+        <div>
+          <label>Repetición</label>
+          <div class="recgrid" id="wa-recgrid">
+            <button class="recbtn sel" data-val="none" onclick="selRec('wa',this)">Sin repetir</button>
+            <button class="recbtn" data-val="daily" onclick="selRec('wa',this)">Diario</button>
+            <button class="recbtn" data-val="weekdays" onclick="selRec('wa',this)">Lun–Vie</button>
+            <button class="recbtn" data-val="weekends" onclick="selRec('wa',this)">Fin de semana</button>
+            <button class="recbtn" data-val="weekly" onclick="selRec('wa',this)">Semanal</button>
+            <button class="recbtn" data-val="custom" onclick="selRec('wa',this)">Personalizado</button>
+          </div>
+          <div class="reccustom" id="wa-customdays">
+            <label>Días</label>
+            <div class="dowgrid">
+              <button class="dowbtn" data-day="1" onclick="togDow(this)">Lun</button>
+              <button class="dowbtn" data-day="2" onclick="togDow(this)">Mar</button>
+              <button class="dowbtn" data-day="3" onclick="togDow(this)">Mié</button>
+              <button class="dowbtn" data-day="4" onclick="togDow(this)">Jue</button>
+              <button class="dowbtn" data-day="5" onclick="togDow(this)">Vie</button>
+              <button class="dowbtn" data-day="6" onclick="togDow(this)">Sáb</button>
+              <button class="dowbtn" data-day="0" onclick="togDow(this)">Dom</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button class="btn grn" id="btnWA" style="width:100%;margin-top:12px" onclick="doSend('wa')">Enviar / Programar por WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROGRAMADOS ══ -->
+<div id="sec-programados" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Envíos programados</div><div class="psub">Mensajes pendientes y recurrentes</div></div>
+    <button class="btn sec sm" onclick="loadScheduled()">↻ Actualizar</button>
+  </div>
+  <div class="schlist" id="schedList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ HISTORIAL ══ -->
+<div id="sec-historial" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Historial de envíos</div><div class="psub">Todos los mensajes con estado de respuesta</div></div>
+    <button class="btn sec sm" onclick="loadHistory()">↻ Actualizar</button>
+  </div>
+  <div class="hlist" id="historyList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ CALENDARIO ══ -->
+<div id="sec-calendario" class="sec">
+  <div class="calh">
+    <div class="calnav">
+      <button class="btn sec sm" onclick="calMove(-1)">‹</button>
+      <div class="calmonth" id="calMonth"></div>
+      <button class="btn sec sm" onclick="calMove(1)">›</button>
+    </div>
+    <div class="brow">
+      <span class="pill pr" style="padding:4px 10px;">✉ Gmail</span>
+      <span class="pill pg" style="padding:4px 10px;">💬 WA</span>
+      <span class="pill pam" style="padding:4px 10px;">📅 Prog.</span>
+      <button class="btn sm" onclick="openCalModal()">+ Programar</button>
+    </div>
+  </div>
+  <div class="calgrid" id="calDows"></div>
+  <div class="calgrid" style="margin-top:5px;" id="calGrid"></div>
+</div>
+
+<!-- ══ ACUERDOS ══ -->
+<div id="sec-acuerdos" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Acuerdos de contenido</div><div class="psub">Cantidad acordada por cliente, red social y periodo</div></div>
+    <button class="btn" onclick="openModal('modalAcuerdo')">+ Nuevo acuerdo</button>
+  </div>
+  <div id="acuerdosList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ CONTENIDO ══ -->
+<div id="sec-contenido" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Administración de contenido</div><div class="psub">Todas las piezas por cliente y estado de producción</div></div>
+    <button class="btn" onclick="openModal('modalContenido')">+ Nueva pieza</button>
+  </div>
+  <div style="margin-bottom:14px;">
+    <label>Filtrar por cliente</label>
+    <select id="contenidoFilter" onchange="loadContenido()" style="max-width:260px;">
+      <option value="">Todos los clientes</option>
+    </select>
+  </div>
+  <div id="contenidoList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ PROPUESTAS ══ -->
+<div id="sec-propuestas" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Propuestas de servicio</div><div class="psub">Formulario y seguimiento de propuestas enviadas a clientes</div></div>
+    <div class="brow">
+      <button class="btn sec sm" onclick="openImportExcel()">📥 Importar Excel</button>
+      <button class="btn" onclick="openAddPropuesta()">+ Nueva propuesta</button>
+    </div>
+  </div>
+  <div id="propuestasList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ MATERIALES ══ -->
+<div id="sec-materiales" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Materiales audiovisuales</div><div class="psub">Archivos enviados por los clientes, organizados por carpeta</div></div>
+    <button class="btn" onclick="openUploadMaterial()">+ Subir material</button>
+  </div>
+  <div style="margin-bottom:14px;">
+    <label>Filtrar por cliente</label>
+    <select id="materialClientFilter" onchange="loadMateriales()" style="max-width:260px;">
+      <option value="">Todos los clientes</option>
+    </select>
+  </div>
+  <div id="materialesTree" style="margin-bottom:18px;"></div>
+  <div id="materialesList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ RESPUESTAS ══ -->
+<div id="sec-respuestas" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Respuestas de clientes</div><div class="psub">Registro completo de respuestas recibidas por cualquier canal</div></div>
+    <button class="btn" onclick="openAddRespuesta()">+ Registrar respuesta manual</button>
+  </div>
+  <div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;">
+    <select id="respClientFilter" onchange="loadRespuestas()" style="max-width:220px;">
+      <option value="">Todos los clientes</option>
+    </select>
+    <select id="respChannelFilter" onchange="loadRespuestas()" style="max-width:180px;">
+      <option value="">Todos los canales</option>
+      <option value="whatsapp">WhatsApp</option>
+      <option value="gmail">Gmail</option>
+      <option value="phone">Teléfono</option>
+      <option value="manual">Manual</option>
+    </select>
+  </div>
+  <div id="respuestasList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ AUDITORÍA ══ -->
+<div id="sec-auditlog" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">Log de auditoría</div><div class="psub">Registro completo de todas las acciones del sistema</div></div>
+    <button class="btn sec sm" onclick="loadAudit()">↻ Actualizar</button>
+  </div>
+  <div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;">
+    <select id="auditClientFilter" onchange="loadAudit()" style="max-width:200px;">
+      <option value="">Todos los clientes</option>
+    </select>
+    <select id="auditEntityFilter" onchange="loadAudit()" style="max-width:180px;">
+      <option value="">Todas las entidades</option>
+      <option value="client">Cliente</option>
+      <option value="propuesta">Propuesta</option>
+      <option value="acuerdo">Acuerdo</option>
+      <option value="contenido">Contenido</option>
+      <option value="message">Mensaje</option>
+      <option value="scheduled">Programado</option>
+      <option value="respuesta">Respuesta</option>
+      <option value="material">Material</option>
+    </select>
+    <select id="auditActionFilter" onchange="loadAudit()" style="max-width:180px;">
+      <option value="">Todas las acciones</option>
+      <option value="created">Creado</option>
+      <option value="updated">Actualizado</option>
+      <option value="sent">Enviado</option>
+      <option value="reply_received">Respuesta recibida</option>
+      <option value="status_change">Cambio de estado</option>
+      <option value="uploaded">Archivo subido</option>
+    </select>
+  </div>
+  <div id="auditList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ CREDENCIALES ══ -->
+<div id="sec-credenciales" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">🔐 Credenciales de redes sociales</div><div class="psub">Contraseñas cifradas con AES-256-GCM. Solo visibles con contraseña de admin.</div></div>
+    <button class="btn" onclick="openModal('modalCredencial')">+ Nueva credencial</button>
+  </div>
+  <div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;">
+    <select id="credClientFilter" onchange="loadCredenciales()" style="max-width:220px;">
+      <option value="">Todos los clientes</option>
+    </select>
+  </div>
+  <div id="credencialesList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ ESTADÍSTICAS ══ -->
+<div id="sec-estadisticas" class="sec">
+  <div class="topbar">
+    <div><div class="ptitle">📈 Estadísticas de redes sociales</div><div class="psub">Ingreso manual de métricas por período. Engagement calculado automáticamente.</div></div>
+    <button class="btn" onclick="openModal('modalEstadistica')">+ Registrar período</button>
+  </div>
+  <div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;">
+    <select id="statClientFilter" onchange="loadEstadisticas()" style="max-width:220px;">
+      <option value="">Todos los clientes</option>
+    </select>
+    <select id="statPlatformFilter" onchange="loadEstadisticas()" style="max-width:180px;">
+      <option value="">Todas las plataformas</option>
+      <option value="instagram">Instagram</option>
+      <option value="facebook">Facebook</option>
+      <option value="tiktok">TikTok</option>
+      <option value="youtube">YouTube</option>
+      <option value="whatsapp">WhatsApp</option>
+      <option value="otro">Otro</option>
+    </select>
+  </div>
+  <!-- Resumen de última métrica por plataforma -->
+  <div id="statResumen" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;"></div>
+  <!-- Historial de registros -->
+  <div id="estadisticasList"><div class="empty">Cargando...</div></div>
+</div>
+
+<!-- ══ PUBLICACIONES ══ -->
+<div id="sec-publicaciones" class="sec">
+  <div class="topbar">
+    <div>
+      <div class="ptitle">🗂️ Publicaciones</div>
+      <div class="psub">Registro de contenido publicado en redes sociales — fecha, plataforma, tipo y URL</div>
+    </div>
+    <button class="btn" onclick="openModalPublicacionNew()">+ Registrar publicación</button>
+  </div>
+
+  <!-- Filtros -->
+  <div style="margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;">
+    <select id="pubClientFilter" onchange="loadPublicaciones()" style="max-width:220px;">
+      <option value="">Todos los clientes</option>
+    </select>
+    <select id="pubPlatformFilter" onchange="loadPublicaciones()" style="max-width:160px;">
+      <option value="">Todas las plataformas</option>
+      <option value="instagram">Instagram</option>
+      <option value="facebook">Facebook</option>
+      <option value="tiktok">TikTok</option>
+      <option value="youtube">YouTube</option>
+      <option value="otro">Otro</option>
+    </select>
+    <select id="pubTypeFilter" onchange="loadPublicaciones()" style="max-width:160px;">
+      <option value="">Todos los tipos</option>
+      <option value="reel">Reel</option>
+      <option value="post">Post</option>
+      <option value="story">Story</option>
+      <option value="carrusel">Carrusel</option>
+      <option value="video">Video</option>
+      <option value="otro">Otro</option>
+    </select>
+  </div>
+
+  <!-- Tarjetas resumen -->
+  <div id="pubResumen" style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:18px;"></div>
+
+  <!-- Lista -->
+  <div id="publicacionesList"><div class="empty">Cargando...</div></div>
+</div>
+
+
+<!-- ══ CONFIG ══ -->
+<div id="sec-config" class="sec">
+  <div class="topbar"><div><div class="ptitle">Configuración</div><div class="psub">Backend y credenciales</div></div></div>
+  <div class="card" style="max-width:540px;margin-bottom:14px;">
+    <div class="ctitle">Servidor backend</div>
+    <label>URL del servidor</label>
+    <input type="text" id="cfg-url" placeholder="http://localhost:3000"/>
+    <p style="font-size:11px;color:var(--muted);margin-top:5px">Local: <code>http://localhost:3000</code> · Railway: <code>https://tu-app.up.railway.app</code></p>
+    <label>API Key</label>
+    <input type="password" id="cfg-key" placeholder="Valor de API_SECRET_KEY en tu .env"/>
+    <div class="brow" style="margin-top:13px;">
+      <button class="btn" onclick="saveConfig()">Guardar y verificar</button>
+      <button class="btn sec" onclick="checkStatus()">Solo verificar</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:9px;margin-top:11px;font-size:11px;color:var(--muted);">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;" id="dotGmail"></span> Gmail &nbsp;
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;" id="dotTwilio"></span> Twilio &nbsp;
+      <span id="cfgMsg"></span>
+    </div>
+  </div>
+  <div class="card" style="max-width:540px;margin-bottom:14px;">
+    <div class="ctitle">Credenciales de acceso</div>
+    <p style="font-size:12px;color:var(--muted);line-height:1.9;">
+      El usuario y contraseña de login se definen en el archivo <code>.env</code> del backend:<br><br>
+      <code style="display:block;padding:8px;background:var(--surface2);border-radius:6px;line-height:1.8;">
+        APP_USERNAME=admin<br>
+        APP_PASSWORD=tu_contraseña_aqui<br>
+        JWT_SECRET=texto_aleatorio_largo
+      </code><br>
+      Reinicia el servidor (<code>npm start</code>) después de cambiar la contraseña.<br>
+      La sesión dura <strong style="color:var(--text)">8 horas</strong>. Al expirar, la app te pedirá iniciar sesión nuevamente.
+    </p>
+  </div>
+  <div class="card" style="max-width:540px;margin-bottom:14px;">
+    <div class="ctitle">WhatsApp — Configuración del sandbox Twilio</div>
+    <p style="font-size:12px;color:var(--muted);line-height:1.9;">
+      <strong style="color:var(--amber)">⚠️ Paso único por cliente:</strong> cada destinatario debe hacer el join al sandbox <b>una sola vez</b>. Después puede recibir mensajes sin ninguna restricción adicional.<br><br>
+      <strong style="color:var(--text)">Instrucciones para tu cliente:</strong><br>
+      1. Abrir WhatsApp en el celular<br>
+      2. Enviar un mensaje al número <code>+1 415 523 8886</code><br>
+      3. El mensaje debe ser exactamente: <code>join &lt;tu-palabra-sandbox&gt;</code><br>
+      4. Twilio responde confirmando la suscripción<br>
+      5. Desde ese momento recibe tus mensajes normalmente<br><br>
+      <strong style="color:var(--text)">¿Dónde encuentro mi palabra sandbox?</strong><br>
+      En <a href="https://console.twilio.com" target="_blank" style="color:var(--accent)">console.twilio.com</a> → Messaging → Try it out → Send a WhatsApp message
+    </p>
+  </div>
+  <div class="card" style="max-width:540px;">
+    <div class="ctitle">Versión</div>
+    <p style="font-size:12px;color:var(--muted);line-height:1.8;">
+      RemindFlow <strong style="color:var(--text)">v4.3.0</strong> — 2026-04-13<br>
+      Login con usuario y contraseña + sesión JWT de 8 horas<br>
+      Consulta <code>CHANGELOG.md</code> para el historial completo.
+    </p>
+  </div>
+</div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- ══ MODAL: CLIENTE ══ -->
+<div class="moverlay" id="modalClient">
+<div class="modal xl">
+  <h2 id="mClientTitle">Nuevo cliente</h2>
+  <input type="hidden" id="c-id"/>
+  <div class="ctitle">Datos generales</div>
+  <div class="frow">
+    <div><label>Nombre / Empresa</label><input type="text" id="c-name" placeholder="Restaurante Verde"/></div>
+    <div><label>Email principal</label><input type="email" id="c-email" placeholder="cliente@email.com"/></div>
+  </div>
+  <label>Notas generales</label>
+  <textarea id="c-notes" placeholder="Información general del cliente..." style="min-height:50px;"></textarea>
+
+  <div class="divider"></div>
+  <div class="ctitle">Perfiles de redes sociales</div>
+
+  <!-- WhatsApp -->
+  <div class="snet-section">
+    <div class="snet-header"><div class="snet-ico" style="background:var(--green-dim)">💬</div><div class="snet-name">WhatsApp</div></div>
+    <div class="frow3">
+      <div><label>Número (con código país)</label><input type="text" id="c-wa-phone" placeholder="+56912345678"/></div>
+      <div><label>Cuenta / Nombre en WA</label><input type="text" id="c-wa-account" placeholder="Nombre en WhatsApp"/></div>
+      <div><label>Notas WA</label><input type="text" id="c-wa-notes" placeholder="Ej: Responde rápido"/></div>
+    </div>
+  </div>
+
+  <!-- Instagram -->
+  <div class="snet-section">
+    <div class="snet-header"><div class="snet-ico" style="background:var(--pink-dim)">📸</div><div class="snet-name">Instagram</div></div>
+    <div class="frow4">
+      <div><label>Usuario (@)</label><input type="text" id="c-ig-account" placeholder="@usuario"/></div>
+      <div><label>Link del perfil</label><input type="url" id="c-ig-link" placeholder="https://instagram.com/..."/></div>
+      <div><label>Teléfono vinculado</label><input type="text" id="c-ig-phone" placeholder="+56..."/></div>
+      <div><label>Notas IG</label><input type="text" id="c-ig-notes" placeholder="Ej: Cuenta verificada"/></div>
+    </div>
+  </div>
+
+  <!-- Facebook -->
+  <div class="snet-section">
+    <div class="snet-header"><div class="snet-ico" style="background:var(--blue-dim)">📘</div><div class="snet-name">Facebook</div></div>
+    <div class="frow4">
+      <div><label>Nombre de página</label><input type="text" id="c-fb-account" placeholder="Página de Facebook"/></div>
+      <div><label>Link del perfil</label><input type="url" id="c-fb-link" placeholder="https://facebook.com/..."/></div>
+      <div><label>Teléfono vinculado</label><input type="text" id="c-fb-phone" placeholder="+56..."/></div>
+      <div><label>Notas FB</label><input type="text" id="c-fb-notes" placeholder="Ej: Administrador: Juan"/></div>
+    </div>
+  </div>
+
+  <!-- TikTok -->
+  <div class="snet-section">
+    <div class="snet-header"><div class="snet-ico" style="background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.1)">🎵</div><div class="snet-name">TikTok</div></div>
+    <div class="frow4">
+      <div><label>Usuario (@)</label><input type="text" id="c-tt-account" placeholder="@usuario"/></div>
+      <div><label>Link del perfil</label><input type="url" id="c-tt-link" placeholder="https://tiktok.com/@..."/></div>
+      <div><label>Teléfono vinculado</label><input type="text" id="c-tt-phone" placeholder="+56..."/></div>
+      <div><label>Notas TT</label><input type="text" id="c-tt-notes" placeholder="Ej: 10k seguidores"/></div>
+    </div>
+  </div>
+
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalClient')">Cancelar</button>
+    <button class="btn" onclick="doSaveClient()">Guardar cliente</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: DETALLE CLIENTE ══ -->
+<div class="moverlay" id="modalDetalle">
+<div class="modal xl">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;">
+    <div>
+      <h2 id="detTitle">Detalle del cliente</h2>
+      <div id="detSub" style="font-size:11px;color:var(--muted);margin-top:2px;"></div>
+    </div>
+    <button class="btn sec xs" onclick="closeModal('modalDetalle')">✕ Cerrar</button>
+  </div>
+  <div class="detail-tabs">
+    <button class="dtab active" onclick="switchDTab('gestion')">📊 Gestión</button>
+    <button class="dtab" onclick="switchDTab('contenidodet')">🎬 Administración de Contenido</button>
+  </div>
+
+  <!-- Gestión -->
+  <div id="dp-gestion" class="dpanel active">
+    <div class="stats-row" id="detStats"></div>
+    <div class="ctitle" style="margin-top:4px;">Redes sociales activas</div>
+    <div id="detRedes" style="margin-bottom:14px;"></div>
+    <div class="ctitle">Acuerdo de contenido</div>
+    <div id="detAcuerdo" style="margin-bottom:14px;"></div>
+    <div class="ctitle">Mensajes enviados</div>
+    <div id="detMensajes"></div>
+  </div>
+
+  <!-- Contenido por cliente -->
+  <div id="dp-contenidodet" class="dpanel">
+    <div class="topbar" style="margin-bottom:12px;">
+      <div class="ctitle" style="margin:0;">Piezas de contenido</div>
+      <button class="btn xs" onclick="openAddContenidoForClient()">+ Nueva pieza</button>
+    </div>
+    <div id="detContenido"></div>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: ACUERDO ══ -->
+<div class="moverlay" id="modalAcuerdo">
+<div class="modal">
+  <h2>Nuevo acuerdo de contenido</h2>
+  <div class="frow">
+    <div><label>Cliente</label><select id="a-client"></select></div>
+    <div><label>Red social</label>
+      <select id="a-platform">
+        <option>Instagram</option><option>Facebook</option>
+        <option>TikTok</option><option>YouTube</option><option>Todas</option>
+      </select>
+    </div>
+  </div>
+  <div class="frow3" style="margin-top:0;">
+    <div><label>Cantidad diaria</label><input type="number" id="a-daily" min="0" value="0"/></div>
+    <div><label>Cantidad semanal</label><input type="number" id="a-weekly" min="0" value="0"/></div>
+    <div><label>Cantidad mensual</label><input type="number" id="a-monthly" min="0" value="0"/></div>
+  </div>
+  <div class="frow">
+    <div><label>Fecha de inicio</label><input type="date" id="a-start"/></div>
+    <div><label>Fecha de término</label><input type="date" id="a-end"/></div>
+  </div>
+  <label>Tipos de contenido acordados</label>
+  <div class="ctgrid" id="a-ctypes" style="margin-top:5px;">
+    <button class="ctbtn" data-val="Foto" onclick="this.classList.toggle('sel')">📷 Foto</button>
+    <button class="ctbtn" data-val="Video" onclick="this.classList.toggle('sel')">🎬 Video</button>
+    <button class="ctbtn" data-val="Reel" onclick="this.classList.toggle('sel')">🎞 Reel</button>
+    <button class="ctbtn" data-val="Historia" onclick="this.classList.toggle('sel')">⏱ Historia</button>
+    <button class="ctbtn" data-val="Texto" onclick="this.classList.toggle('sel')">📝 Texto</button>
+  </div>
+  <label>Notas del acuerdo</label>
+  <textarea id="a-notes" placeholder="Detalles adicionales del acuerdo..." style="min-height:55px;"></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalAcuerdo')">Cancelar</button>
+    <button class="btn" onclick="doSaveAcuerdo()">Guardar acuerdo</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: CONTENIDO ══ -->
+<div class="moverlay" id="modalContenido">
+<div class="modal lg">
+  <h2>Nueva pieza de contenido</h2>
+  <input type="hidden" id="co-id"/>
+  <div class="frow">
+    <div><label>Cliente</label><select id="co-client"></select></div>
+    <div><label>Red social</label>
+      <select id="co-platform">
+        <option>Instagram</option><option>Facebook</option>
+        <option>TikTok</option><option>YouTube</option>
+      </select>
+    </div>
+  </div>
+  <div class="frow">
+    <div><label>Tipo de contenido</label>
+      <select id="co-type">
+        <option>Foto</option><option>Video</option><option>Reel</option>
+        <option>Historia</option><option>Texto</option><option>Otro</option>
+      </select>
+    </div>
+    <div><label>Nombre del contenido</label><input type="text" id="co-name" placeholder="Ej: Receta semanal semana 3"/></div>
+  </div>
+  <div class="frow">
+    <div><label>Estado</label>
+      <select id="co-status">
+        <option value="agreed">Acordado</option>
+        <option value="reminded">Recordatorio enviado</option>
+        <option value="replied">Cliente respondió</option>
+        <option value="inprod">En producción</option>
+        <option value="delivered">Entregado</option>
+        <option value="published">Publicado</option>
+      </select>
+    </div>
+    <div><label>Fecha compromiso</label><input type="date" id="co-due"/></div>
+  </div>
+  <label>Descripción / notas</label>
+  <textarea id="co-desc" placeholder="Descripción, hashtags, referencias, notas de producción..." style="min-height:60px;"></textarea>
+  <label>Respuesta del cliente</label>
+  <textarea id="co-reply" placeholder="Si el cliente respondió, anota aquí su respuesta..." style="min-height:50px;"></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalContenido')">Cancelar</button>
+    <button class="btn" onclick="doSaveContenido()">Guardar</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: DESDE CALENDARIO ══ -->
+<div class="moverlay" id="modalCalSend">
+<div class="modal">
+  <h2 id="calTitle">Programar desde calendario</h2>
+  <div class="frow">
+    <div><label>Canal</label>
+      <select id="cal-channel">
+        <option value="gmail">Gmail</option><option value="whatsapp">WhatsApp</option>
+      </select>
+    </div>
+    <div><label>Cliente</label><select id="cal-client"></select></div>
+  </div>
+  <label>Fecha y hora</label><input type="datetime-local" id="cal-dt"/>
+  <label>Tipo de contenido</label>
+  <select id="cal-ctype">
+    <option value="">— Selecciona —</option>
+    <option>Foto</option><option>Video</option><option>Reel</option><option>Historia</option><option>Texto</option>
+  </select>
+  <label>Nombre del contenido</label><input type="text" id="cal-cname" placeholder="Ej: Receta semanal"/>
+  <label>Asunto (Gmail)</label><input type="text" id="cal-subject" placeholder="Opcional"/>
+  <label>Mensaje</label><textarea id="cal-body" placeholder="Escribe el mensaje..."></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalCalSend')">Cancelar</button>
+    <button class="btn" onclick="doCalSend()">Programar</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: MARCAR RESPUESTA ══ -->
+<div class="moverlay" id="modalReply">
+<div class="modal">
+  <h2>Registrar respuesta del cliente</h2>
+  <input type="hidden" id="reply-msgid"/>
+  <label>Fecha y hora de respuesta</label>
+  <input type="datetime-local" id="reply-dt"/>
+  <label>Contenido de la respuesta</label>
+  <textarea id="reply-content" placeholder="¿Qué respondió el cliente?"></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalReply')">Cancelar</button>
+    <button class="btn" onclick="doSaveReply()">Guardar respuesta</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: PROPUESTA ══ -->
+<div class="moverlay" id="modalPropuesta">
+<div class="modal lg">
+  <h2 id="mPropTitle">Nueva propuesta de servicio</h2>
+  <input type="hidden" id="p-id"/>
+  <div class="frow">
+    <div><label>Cliente</label><select id="p-client"></select></div>
+    <div><label>Plan / Nombre de la propuesta</label><input type="text" id="p-plan" placeholder="Ej: Plan Crecimiento — Instagram + Facebook"/></div>
+  </div>
+  <div class="frow3">
+    <div><label>Valor mensual (CLP)</label><input type="number" id="p-value" placeholder="490000"/></div>
+    <div><label>Moneda</label><select id="p-currency"><option value="CLP">CLP</option><option value="UF">UF</option><option value="USD">USD</option></select></div>
+    <div><label>Duración del contrato (meses)</label><input type="number" id="p-months" value="3" min="1"/></div>
+  </div>
+  <div class="frow3">
+    <div><label>Cantidad diaria</label><input type="number" id="p-daily" value="0" min="0"/></div>
+    <div><label>Cantidad semanal</label><input type="number" id="p-weekly" value="0" min="0"/></div>
+    <div><label>Cantidad mensual</label><input type="number" id="p-monthly" value="0" min="0"/></div>
+  </div>
+  <div class="frow">
+    <div>
+      <label>Plataformas</label>
+      <div class="ctgrid" id="p-platforms">
+        <button class="ctbtn" data-val="Instagram" onclick="this.classList.toggle('sel')">📸 Instagram</button>
+        <button class="ctbtn" data-val="Facebook" onclick="this.classList.toggle('sel')">📘 Facebook</button>
+        <button class="ctbtn" data-val="TikTok" onclick="this.classList.toggle('sel')">🎵 TikTok</button>
+        <button class="ctbtn" data-val="YouTube" onclick="this.classList.toggle('sel')">▶️ YouTube</button>
+      </div>
+    </div>
+    <div>
+      <label>Tipos de contenido incluidos</label>
+      <div class="ctgrid" id="p-ctypes">
+        <button class="ctbtn" data-val="Foto" onclick="this.classList.toggle('sel')">📷 Foto</button>
+        <button class="ctbtn" data-val="Video" onclick="this.classList.toggle('sel')">🎬 Video</button>
+        <button class="ctbtn" data-val="Reel" onclick="this.classList.toggle('sel')">🎞 Reel</button>
+        <button class="ctbtn" data-val="Historia" onclick="this.classList.toggle('sel')">⏱ Historia</button>
+        <button class="ctbtn" data-val="Texto" onclick="this.classList.toggle('sel')">📝 Texto</button>
+      </div>
+    </div>
+  </div>
+  <div class="frow">
+    <div><label>Fecha de envío de propuesta</label><input type="date" id="p-sentdate"/></div>
+    <div><label>Fecha de revisión</label><input type="date" id="p-reviewdate"/></div>
+  </div>
+  <div class="frow">
+    <div><label>Fecha de aprobación</label><input type="date" id="p-approvaldate"/></div>
+    <div><label>Fecha de puesta en marcha</label><input type="date" id="p-startdate"/></div>
+  </div>
+  <label>Condiciones adicionales</label>
+  <textarea id="p-conditions" placeholder="Ej: El cliente debe proveer fotografías semanalmente..." style="min-height:55px;"></textarea>
+  <label>Comentarios</label>
+  <textarea id="p-comments" placeholder="Comentarios del cliente o notas de la negociación..." style="min-height:55px;"></textarea>
+  <label>Notas internas (solo visible para el administrador)</label>
+  <textarea id="p-internal" placeholder="Notas privadas sobre esta propuesta..." style="min-height:45px;"></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalPropuesta')">Cancelar</button>
+    <button class="btn" onclick="doSavePropuesta()">Guardar propuesta</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: IMPORT EXCEL ══ -->
+<div class="moverlay" id="modalImportExcel">
+<div class="modal">
+  <h2>Importar propuestas desde Excel</h2>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:12px;line-height:1.7;">El archivo Excel debe tener las siguientes columnas:<br>
+  <code>clientId, plan, valor_mensual, moneda, cantidad_diaria, cantidad_semanal, cantidad_mensual, fecha_envio, fecha_revision, fecha_aprobacion, fecha_inicio, meses_contrato, condiciones, comentarios, notas_internas, plataformas, tipos_contenido</code></p>
+  <label>Selecciona el archivo Excel (.xlsx o .csv)</label>
+  <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="margin-top:6px;"/>
+  <div id="excelPreview" style="margin-top:12px;font-size:12px;color:var(--muted);"></div>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalImportExcel')">Cancelar</button>
+    <button class="btn" onclick="doImportExcel()">Importar</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: SUBIR MATERIAL ══ -->
+<div class="moverlay" id="modalUpload">
+<div class="modal">
+  <h2>Subir material del cliente</h2>
+  <div class="frow">
+    <div><label>Cliente</label><select id="up-client"></select></div>
+    <div><label>Pieza de contenido asociada (opcional)</label><select id="up-contenido"><option value="">— Sin asociar —</option></select></div>
+  </div>
+  <label>Archivos (imágenes, videos, PDF — máx. 200MB cada uno)</label>
+  <input type="file" id="up-files" multiple accept="image/*,video/*,.pdf" style="margin-top:6px;"/>
+  <label>Notas sobre este material</label>
+  <textarea id="up-notes" placeholder="Ej: Video enviado por WhatsApp el lunes..." style="min-height:50px;"></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalUpload')">Cancelar</button>
+    <button class="btn" id="btnUpload" onclick="doUploadMaterial()">Subir archivos</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: RESPUESTA MANUAL ══ -->
+<div class="moverlay" id="modalRespuesta">
+<div class="modal">
+  <h2>Registrar respuesta del cliente</h2>
+  <div class="frow">
+    <div><label>Cliente</label><select id="r-client" onchange="loadContenidoForRespuesta()"></select></div>
+    <div><label>Canal de respuesta</label>
+      <select id="r-channel">
+        <option value="whatsapp">WhatsApp</option>
+        <option value="gmail">Email/Gmail</option>
+        <option value="phone">Teléfono</option>
+        <option value="presencial">Presencial</option>
+        <option value="manual">Otro</option>
+      </select>
+    </div>
+  </div>
+  <div class="frow">
+    <div><label>Fecha y hora de la respuesta</label><input type="datetime-local" id="r-datetime"/></div>
+    <div><label>Pieza de contenido asociada</label><select id="r-contenido"><option value="">— Sin asociar —</option></select></div>
+  </div>
+  <label>Contenido de la respuesta</label>
+  <textarea id="r-content" placeholder="¿Qué dijo el cliente? Ej: Confirmó que enviará el video mañana..." style="min-height:80px;"></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalRespuesta')">Cancelar</button>
+    <button class="btn" onclick="doSaveRespuesta()">Guardar respuesta</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: NUEVA CREDENCIAL ══ -->
+<div class="moverlay" id="modalCredencial">
+<div class="modal">
+  <h2>Nueva credencial de red social</h2>
+  <input type="hidden" id="cred-id"/>
+  <div class="frow">
+    <div><label>Cliente</label><select id="cred-client"></select></div>
+    <div><label>Plataforma</label>
+      <select id="cred-platform">
+        <option value="instagram">Instagram</option>
+        <option value="facebook">Facebook</option>
+        <option value="tiktok">TikTok</option>
+        <option value="whatsapp">WhatsApp</option>
+        <option value="youtube">YouTube</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+  </div>
+  <label>Usuario / correo</label>
+  <input type="text" id="cred-username" placeholder="@usuario o correo de acceso"/>
+  <label>Contraseña <span style="font-size:11px;color:var(--muted)">(se cifra con AES-256 antes de guardar)</span></label>
+  <div style="display:flex;gap:8px;align-items:center;">
+    <input type="password" id="cred-password" placeholder="Contraseña de la cuenta" style="flex:1;"/>
+    <button class="btn sec sm" type="button" onclick="toggleCredPass('cred-password',this)">👁</button>
+  </div>
+  <label>Notas (opcional)</label>
+  <textarea id="cred-notes" placeholder="Ej: Cuenta Business, 2FA activado, email de recuperación..." style="min-height:50px;"></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalCredencial')">Cancelar</button>
+    <button class="btn" onclick="doSaveCredencial()">Guardar cifrada</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: REVEAL CONTRASEÑA ══ -->
+<div class="moverlay" id="modalReveal">
+<div class="modal" style="max-width:400px;">
+  <h2>🔐 Verificar identidad</h2>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Ingresa tu contraseña de admin para ver esta credencial. El acceso quedará registrado en auditoría.</p>
+  <input type="hidden" id="reveal-credId"/>
+  <label>Contraseña de admin</label>
+  <input type="password" id="reveal-adminPass" placeholder="Tu contraseña de acceso a RemindFlow"/>
+  <div id="revealResult" style="margin-top:12px;display:none;">
+    <label>Contraseña revelada</label>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <input type="text" id="revealPassword" readonly style="flex:1;background:var(--surface2);"/>
+      <button class="btn sec sm" onclick="copyRevealPass()">📋</button>
+    </div>
+  </div>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalReveal');document.getElementById('revealResult').style.display='none';">Cerrar</button>
+    <button class="btn" onclick="doRevealCredencial()">Verificar y mostrar</button>
+  </div>
+</div>
+</div>
+
+<!-- ══ MODAL: NUEVA ESTADÍSTICA ══ -->
+<div class="moverlay" id="modalEstadistica">
+<div class="modal" style="max-width:620px;">
+  <h2>Registrar métricas del período</h2>
+  <input type="hidden" id="stat-id"/>
+  <div class="frow">
+    <div><label>Cliente</label><select id="stat-client"></select></div>
+    <div><label>Plataforma</label>
+      <select id="stat-platform">
+        <option value="instagram">Instagram</option>
+        <option value="facebook">Facebook</option>
+        <option value="tiktok">TikTok</option>
+        <option value="youtube">YouTube</option>
+        <option value="whatsapp">WhatsApp</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+  </div>
+  <div class="frow">
+    <div><label>Inicio del período</label><input type="date" id="stat-from"/></div>
+    <div><label>Fin del período</label><input type="date" id="stat-to"/></div>
+  </div>
+  <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:12px;">
+    <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">Audiencia</div>
+    <div class="frow">
+      <div><label>Seguidores totales</label><input type="number" id="stat-followers" min="0" placeholder="0"/></div>
+      <div><label>Nuevos seguidores</label><input type="number" id="stat-newFollowers" min="0" placeholder="0"/></div>
+    </div>
+  </div>
+  <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:12px;">
+    <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">Alcance</div>
+    <div class="frow">
+      <div><label>Alcance (reach)</label><input type="number" id="stat-reach" min="0" placeholder="0"/></div>
+      <div><label>Impresiones</label><input type="number" id="stat-impressions" min="0" placeholder="0"/></div>
+    </div>
+  </div>
+  <div style="background:var(--surface2);border-radius:8px;padding:12px;margin-bottom:12px;">
+    <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;">Interacciones</div>
+    <div class="frow">
+      <div><label>Likes</label><input type="number" id="stat-likes" min="0" placeholder="0"/></div>
+      <div><label>Comentarios</label><input type="number" id="stat-comments" min="0" placeholder="0"/></div>
+    </div>
+    <div class="frow">
+      <div><label>Guardados</label><input type="number" id="stat-saves" min="0" placeholder="0"/></div>
+      <div><label>Compartidos</label><input type="number" id="stat-shares" min="0" placeholder="0"/></div>
+    </div>
+    <div class="frow">
+      <div><label>Vistas (Reels / video)</label><input type="number" id="stat-views" min="0" placeholder="0"/></div>
+      <div><label>Publicaciones del período</label><input type="number" id="stat-posts" min="0" placeholder="0"/></div>
+    </div>
+  </div>
+  <label>Notas (opcional)</label>
+  <textarea id="stat-notes" placeholder="Observaciones del período..." style="min-height:40px;"></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalEstadistica')">Cancelar</button>
+    <button class="btn" onclick="doSaveEstadistica()">Guardar métricas</button>
+  </div>
+</div>
+</div>
+
+
+<!-- ══ MODAL PUBLICACION ══ -->
+<div class="moverlay" id="modalPublicacion">
+<div class="modal" style="max-width:600px;">
+  <h2>Registrar publicación</h2>
+  <input type="hidden" id="pub-id"/>
+  <div class="frow">
+    <div><label>Cliente *</label><select id="pub-client" onchange="loadContenidoForPub(this.value)"></select></div>
+    <div><label>Plataforma *</label>
+      <select id="pub-platform">
+        <option value="instagram">Instagram</option>
+        <option value="facebook">Facebook</option>
+        <option value="tiktok">TikTok</option>
+        <option value="youtube">YouTube</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+  </div>
+  <div class="frow">
+    <div><label>Tipo de contenido *</label>
+      <select id="pub-contentType">
+        <option value="reel">Reel</option>
+        <option value="post">Post</option>
+        <option value="story">Story</option>
+        <option value="carrusel">Carrusel</option>
+        <option value="video">Video</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div><label>Fecha y hora de publicación *</label>
+      <input type="datetime-local" id="pub-publishedAt"/>
+    </div>
+  </div>
+  <label>URL del post (opcional)</label>
+  <input type="url" id="pub-url" placeholder="https://www.instagram.com/p/..."/>
+  <label>Caption / copy del post (opcional)</label>
+  <textarea id="pub-caption" placeholder="Texto del post tal como fue publicado..." style="min-height:60px;"></textarea>
+  <label>Pieza de contenido vinculada (opcional)</label>
+  <select id="pub-contenido">
+    <option value="">— Sin vincular —</option>
+  </select>
+  <label>Notas internas (opcional)</label>
+  <textarea id="pub-notes" placeholder="Observaciones, contexto..." style="min-height:40px;"></textarea>
+  <div class="mact">
+    <button class="btn sec" onclick="closeModal('modalPublicacion')">Cancelar</button>
+    <button class="btn" onclick="doSavePublicacion()">Guardar publicación</button>
+  </div>
+</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const COLORS=['#7c6ff7','#25d366','#ea4335','#f59e0b','#06b6d4','#ec4899','#a78bfa','#34d399'];
+const MONTHS=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const DAYS=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+const RL={none:'Sin repetir',daily:'Diario',weekdays:'Lun–Vie',weekends:'Fin de semana',weekly:'Semanal',custom:'Personalizado'};
+const ST_LABELS={agreed:'Acordado',reminded:'Recordatorio enviado',replied:'Cliente respondió',inprod:'En producción',delivered:'Entregado',published:'Publicado',overdue:'Vencido',pending:'Pendiente'};
+const ST_CLS={agreed:'st-agreed',reminded:'st-reminded',replied:'st-replied',inprod:'st-inprod',delivered:'st-delivered',published:'st-published',overdue:'st-overdue',pending:'st-pending'};
+
+let CFG={url:'',key:''};
+let localClients=[];
+let localHistory=[];
+let localScheduled=[];
+let localAcuerdos=[];
+let localContenido=[];
+let calDate=new Date();
+let selCType_val='';
+let recSt={gmail:'none',wa:'none'};
+let currentDetailClientId=null;
+
+// ── AUTH & LOGIN ─────────────────────────────────────────────
+let SESSION = { token: null, username: null };
+
+function loadSession() {
+  try {
+    const s = JSON.parse(localStorage.getItem('rf_session') || 'null');
+    if (s && s.token) { SESSION = s; return true; }
+  } catch {}
+  return false;
+}
+function saveSession(token, username) {
+  SESSION = { token, username };
+  try { localStorage.setItem('rf_session', JSON.stringify(SESSION)); } catch {}
+}
+function clearSession() {
+  SESSION = { token: null, username: null };
+  try { localStorage.removeItem('rf_session'); } catch {}
+}
+
+async function doLogin() {
+  const btn  = document.getElementById('loginBtn');
+  const user = document.getElementById('loginUser').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const err  = document.getElementById('loginErr');
+  err.textContent = '';
+  if (!user || !pass) { err.textContent = 'Ingresa usuario y contraseña.'; return; }
+  if (!CFG.url) { err.textContent = 'Primero configura la URL del servidor en el campo de abajo.'; return; }
+  btn.disabled = true; btn.textContent = 'Iniciando sesión...';
+  try {
+    const res  = await fetch(CFG.url + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: user, password: pass }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Error al iniciar sesión');
+    saveSession(data.token, data.username);
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('headerUser').textContent = data.username;
+    document.getElementById('loginPass').value = '';
+    loadAll();
+    checkStatus();
+  } catch (e) {
+    err.textContent = e.message;
+  }
+  btn.disabled = false; btn.textContent = 'Iniciar sesión';
+}
+
+async function doLogout() {
+  try { await apiFetch('/auth/logout', { method: 'POST' }); } catch {}
+  clearSession();
+  document.getElementById('loginOverlay').classList.remove('hidden');
+  document.getElementById('headerUser').textContent = '';
+  document.getElementById('loginUser').value = '';
+  document.getElementById('svcBadge').className = 'hbadge chk';
+  document.getElementById('svcBadge').textContent = 'verificando...';
+}
+
+async function checkActiveSession() {
+  if (!SESSION.token || !CFG.url) return false;
+  try {
+    const res = await fetch(CFG.url + '/auth/me', {
+      headers: { 'Authorization': 'Bearer ' + SESSION.token }
+    });
+    if (res.ok) {
+      const d = await res.json();
+      document.getElementById('headerUser').textContent = d.username;
+      return true;
+    }
+  } catch {}
+  return false;
+}
+
+// ── CONFIG ────────────────────────────────────────────────────
+function loadCfg(){
+  try{const s=JSON.parse(localStorage.getItem('rf_cfg')||'{}');CFG.url=s.url||window.location.origin;CFG.key=s.key||'';}catch{CFG.url=window.location.origin;}
+  const urlEl=document.getElementById('cfg-url');
+  const keyEl=document.getElementById('cfg-key');
+  if(urlEl) urlEl.value=CFG.url;
+  if(keyEl) keyEl.value=CFG.key;
+}
+function saveConfig(){
+  CFG.url=document.getElementById('cfg-url').value.trim().replace(/\/$/,'');
+  CFG.key=document.getElementById('cfg-key').value.trim();
+  try{localStorage.setItem('rf_cfg',JSON.stringify(CFG));}catch{}
+  showToast('Configuración guardada','ok');
+  checkStatus(); loadAll();
+}
+async function apiFetch(path, opts={}) {
+  if (!CFG.url) throw new Error('Configura la URL del servidor en ⚙️ Configuración');
+  const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
+  // Prefer JWT session token, fall back to API Key for backward compatibility
+  if (SESSION.token) {
+    headers['Authorization'] = 'Bearer ' + SESSION.token;
+  } else if (CFG.key) {
+    headers['X-API-Key'] = CFG.key;
+  } else {
+    throw new Error('No hay sesión activa. Por favor inicia sesión.');
+  }
+  const res  = await fetch(CFG.url + path, { ...opts, headers });
+  const data = await res.json();
+  if (res.status === 401) {
+    clearSession();
+    document.getElementById('loginOverlay').classList.remove('hidden');
+    throw new Error('Sesión expirada. Por favor inicia sesión nuevamente.');
+  }
+  if (!res.ok) throw new Error(data.error || 'Error del servidor');
+  return data;
+}
+async function checkStatus(){
+  const badge=document.getElementById('svcBadge');
+  badge.className='hbadge chk'; badge.textContent='verificando...';
+  try{
+    const s=await apiFetch('/api/status');
+    const gOk=s.gmail&&s.gmail.includes('conectado');
+    const tOk=s.twilio&&s.twilio.includes('conectado');
+    setDot('dotGmail',gOk); setDot('dotTwilio',tOk);
+    if(gOk&&tOk){badge.className='hbadge ok';badge.textContent='Servicios OK';}
+    else{badge.className='hbadge err';badge.textContent='Error servicios';}
+    document.getElementById('cfgMsg').textContent=(gOk?'Gmail ✓':'Gmail ✗')+' '+(tOk?'Twilio ✓':'Twilio ✗');
+  }catch(e){
+    badge.className='hbadge err'; badge.textContent='Sin conexión';
+    document.getElementById('cfgMsg').textContent=e.message;
+    setDot('dotGmail',false); setDot('dotTwilio',false);
+  }
+}
+function setDot(id,ok){const el=document.getElementById(id);if(el)el.style.background=ok?'var(--green)':'var(--red)';}
+
+// ── CLIENTES ────────────────────────────────────────────────
+function getInit(n){return n.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();}
+function colFor(i){return COLORS[i%COLORS.length];}
+function getSocials(c){
+  const s=[];
+  if(c.waPhone||c.waAccount) s.push({k:'wa',label:'WA',cls:'sn-wa',ico:'💬'});
+  if(c.igAccount) s.push({k:'ig',label:'IG',cls:'sn-ig',ico:'📸'});
+  if(c.fbAccount) s.push({k:'fb',label:'FB',cls:'sn-fb',ico:'📘'});
+  if(c.ttAccount) s.push({k:'tt',label:'TT',cls:'sn-tt',ico:'🎵'});
+  return s;
+}
+
+async function loadClients(){
+  const grid=document.getElementById('clientGrid');
+  try{
+    localClients=await apiFetch('/api/clients');
+  }catch(e){
+    grid.innerHTML=`<div class="empty">${e.message}</div>`; return;
+  }
+  if(!localClients.length){grid.innerHTML='<div class="empty">Sin clientes. Agrega uno con el botón.</div>';populateSelects();return;}
+  grid.innerHTML=localClients.map((c,i)=>{
+    const col=colFor(i);
+    const socials=getSocials(c);
+    return `<div class="ccard">
+      <div class="cavatar" style="background:${col}22;color:${col}">${getInit(c.name)}</div>
+      <div class="cname">${c.name}</div>
+      <div class="cmeta">${c.email}</div>
+      <div class="snet-badges">${socials.map(s=>`<span class="snet ${s.cls}">${s.ico} ${s.label}</span>`).join('')}</div>
+      <div class="cactions">
+        <button class="btn xs" onclick="openDetalle('${c.id}')">👁 Ver detalle</button>
+        <button class="btn xs sec" onclick="openEditClient('${c.id}')">✏️ Editar</button>
+        <button class="btn xs sec" onclick="quickSend('${c.id}','gmail')">✉️</button>
+        <button class="btn xs grn" onclick="quickSend('${c.id}','wa')">💬</button>
+        <button class="btn xs sec" onclick="doDeleteClient('${c.id}')">🗑</button>
+      </div>
+    </div>`;
+  }).join('');
+  populateSelects();
+}
+
+function openAddClient(){
+  document.getElementById('mClientTitle').textContent='Nuevo cliente';
+  document.getElementById('c-id').value='';
+  ['c-name','c-email','c-notes','c-wa-phone','c-wa-account','c-wa-notes',
+   'c-ig-account','c-ig-link','c-ig-phone','c-ig-notes',
+   'c-fb-account','c-fb-link','c-fb-phone','c-fb-notes',
+   'c-tt-account','c-tt-link','c-tt-phone','c-tt-notes'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  openModal('modalClient');
+}
+function openEditClient(id){
+  const c=localClients.find(x=>x.id===id); if(!c)return;
+  document.getElementById('mClientTitle').textContent='Editar cliente';
+  document.getElementById('c-id').value=c.id;
+  const map={
+    'c-name':c.name,'c-email':c.email,'c-notes':c.notes||'',
+    'c-wa-phone':c.waPhone||'','c-wa-account':c.waAccount||'','c-wa-notes':c.waNotes||'',
+    'c-ig-account':c.igAccount||'','c-ig-link':c.igLink||'','c-ig-phone':c.igPhone||'','c-ig-notes':c.igNotes||'',
+    'c-fb-account':c.fbAccount||'','c-fb-link':c.fbLink||'','c-fb-phone':c.fbPhone||'','c-fb-notes':c.fbNotes||'',
+    'c-tt-account':c.ttAccount||'','c-tt-link':c.ttLink||'','c-tt-phone':c.ttPhone||'','c-tt-notes':c.ttNotes||'',
+  };
+  Object.entries(map).forEach(([elId,val])=>{const el=document.getElementById(elId);if(el)el.value=val;});
+  openModal('modalClient');
+}
+async function doSaveClient(){
+  const id=document.getElementById('c-id').value;
+  const body={
+    name:document.getElementById('c-name').value.trim(),
+    email:document.getElementById('c-email').value.trim(),
+    notes:document.getElementById('c-notes').value.trim(),
+    waPhone:document.getElementById('c-wa-phone').value.trim(),
+    waAccount:document.getElementById('c-wa-account').value.trim(),
+    waNotes:document.getElementById('c-wa-notes').value.trim(),
+    igAccount:document.getElementById('c-ig-account').value.trim(),
+    igLink:document.getElementById('c-ig-link').value.trim(),
+    igPhone:document.getElementById('c-ig-phone').value.trim(),
+    igNotes:document.getElementById('c-ig-notes').value.trim(),
+    fbAccount:document.getElementById('c-fb-account').value.trim(),
+    fbLink:document.getElementById('c-fb-link').value.trim(),
+    fbPhone:document.getElementById('c-fb-phone').value.trim(),
+    fbNotes:document.getElementById('c-fb-notes').value.trim(),
+    ttAccount:document.getElementById('c-tt-account').value.trim(),
+    ttLink:document.getElementById('c-tt-link').value.trim(),
+    ttPhone:document.getElementById('c-tt-phone').value.trim(),
+    ttNotes:document.getElementById('c-tt-notes').value.trim(),
+  };
+  if(!body.name||!body.email){showToast('Nombre y email son obligatorios','err');return;}
+  try{
+    if(id) await apiFetch('/api/clients/'+id,{method:'PUT',body:JSON.stringify(body)});
+    else   await apiFetch('/api/clients',{method:'POST',body:JSON.stringify(body)});
+    showToast(id?'Cliente actualizado ✓':'Cliente agregado ✓','ok');
+    closeModal('modalClient');
+    await loadClients();
+  }catch(e){showToast(e.message,'err');}
+}
+async function doDeleteClient(id){
+  if(!confirm('¿Eliminar este cliente?'))return;
+  try{await apiFetch('/api/clients/'+id,{method:'DELETE'});showToast('Cliente eliminado','ok');await loadClients();}
+  catch(e){showToast(e.message,'err');}
+}
+
+// ── DETALLE CLIENTE ─────────────────────────────────────────
+async function openDetalle(id){
+  currentDetailClientId=id;
+  const c=localClients.find(x=>x.id===id); if(!c)return;
+  document.getElementById('detTitle').textContent=c.name;
+  document.getElementById('detSub').textContent=c.email;
+  switchDTab('gestion');
+  await renderDetGestion(c);
+  await renderDetContenido(c);
+  openModal('modalDetalle');
+}
+
+async function renderDetGestion(c){
+  const msgs=localHistory.filter(h=>h.clientId===c.id);
+  const replied=msgs.filter(h=>h.replied);
+  const acuerdo=localAcuerdos.find(a=>a.clientId===c.id);
+  const socials=getSocials(c);
+
+  document.getElementById('detStats').innerHTML=`
+    <div class="stat"><div class="stat-num" style="color:var(--accent)">${msgs.length}</div><div class="stat-label">Mensajes enviados</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--green)">${replied.length}</div><div class="stat-label">Respuestas recibidas</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--amber)">${msgs.length-replied.length}</div><div class="stat-label">Sin respuesta</div></div>
+    <div class="stat"><div class="stat-num" style="color:var(--blue)">${socials.length}</div><div class="stat-label">Redes activas</div></div>
+  `;
+
+  document.getElementById('detRedes').innerHTML=socials.length?socials.map(s=>{
+    const acct=s.k==='wa'?c.waAccount:s.k==='ig'?c.igAccount:s.k==='fb'?c.fbAccount:c.ttAccount;
+    const link=s.k==='ig'?c.igLink:s.k==='fb'?c.fbLink:s.k==='tt'?c.ttLink:'';
+    const phone=s.k==='wa'?c.waPhone:s.k==='ig'?c.igPhone:s.k==='fb'?c.fbPhone:c.ttPhone;
+    const notes=s.k==='wa'?c.waNotes:s.k==='ig'?c.igNotes:s.k==='fb'?c.fbNotes:c.ttNotes;
+    const nm=s.k==='wa'?'WhatsApp':s.k==='ig'?'Instagram':s.k==='fb'?'Facebook':'TikTok';
+    return `<div class="snet-section" style="margin-bottom:8px;">
+      <div class="snet-header"><div class="snet-ico">${s.ico}</div><div class="snet-name">${nm}</div></div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;">
+        ${acct?'<b style="color:var(--text)">Cuenta:</b> '+acct+'<br>':''}
+        ${phone?'<b style="color:var(--text)">Teléfono:</b> '+phone+'<br>':''}
+        ${link?'<b style="color:var(--text)">Link:</b> <a href="'+link+'" target="_blank" style="color:var(--accent)">'+link+'</a><br>':''}
+        ${notes?'<b style="color:var(--text)">Notas:</b> '+notes:''}
+      </div>
+    </div>`;
+  }).join(''):'<div style="font-size:11px;color:var(--muted);padding:8px 0;">Sin redes sociales configuradas.</div>';
+
+  document.getElementById('detAcuerdo').innerHTML=acuerdo?`
+    <div style="background:var(--surface2);border-radius:9px;padding:12px;font-size:12px;line-height:1.9;">
+      <b style="color:var(--text)">${acuerdo.platform}</b><br>
+      Diario: <b>${acuerdo.daily}</b> · Semanal: <b>${acuerdo.weekly}</b> · Mensual: <b>${acuerdo.monthly}</b><br>
+      ${acuerdo.contentTypes?'Tipos: <b>'+acuerdo.contentTypes+'</b><br>':''}
+      ${acuerdo.startDate?'Vigencia: '+acuerdo.startDate+' → '+(acuerdo.endDate||'indefinido')+'<br>':''}
+      ${acuerdo.notes?'Notas: '+acuerdo.notes:''}
+    </div>
+  `:'<div style="font-size:11px;color:var(--muted);padding:8px 0;">Sin acuerdo registrado. <button class="btn xs" onclick="ST(\'acuerdos\');closeModal(\'modalDetalle\')">Agregar acuerdo</button></div>';
+
+  document.getElementById('detMensajes').innerHTML=msgs.length?msgs.slice(0,10).map(h=>{
+    const time=h.createdAt?new Date(h.createdAt).toLocaleString('es-CL',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+    return `<div class="hitem" style="margin-bottom:6px;">
+      <div class="hch" style="background:${h.channel==='gmail'?'var(--red-dim)':'var(--green-dim)'}">${h.channel==='gmail'?'✉️':'💬'}</div>
+      <div class="hinfo">
+        <div class="hmain">${h.subject||h.preview||'Mensaje'}</div>
+        <div class="hsub">${time} ${h.replied
+          ?'<span class="replied-badge rb-yes">✓ Respondido '+h.repliedAt+'</span>'
+          :'<span class="replied-badge rb-no">Sin respuesta</span>'}</div>
+      </div>
+      ${!h.replied?`<button class="btn xs sec" onclick="openReply('${h.id}')">+ Respuesta</button>`:''}
+    </div>`;
+  }).join(''):'<div style="font-size:11px;color:var(--muted);padding:8px 0;">Sin mensajes enviados a este cliente.</div>';
+}
+
+async function renderDetContenido(c){
+  let piezas=[];
+  try{piezas=await apiFetch('/api/contenido?clientId='+c.id);}catch{}
+  const el=document.getElementById('detContenido');
+  if(!el)return;
+  el.innerHTML=piezas.length?piezas.map(p=>`
+    <div class="content-row">
+      <div class="ticon" style="background:var(--accent-dim)">${p.type==='Video'?'🎬':p.type==='Foto'?'📷':p.type==='Reel'?'🎞':p.type==='Historia'?'⏱':'📝'}</div>
+      <div class="cr-info">
+        <div class="cr-name">${p.name}</div>
+        <div class="cr-meta">${p.platform||'—'} · Vence: ${p.due||'—'}</div>
+      </div>
+      <span class="tst ${ST_CLS[p.status]||'st-pending'}">${ST_LABELS[p.status]||p.status}</span>
+      <button class="btn xs sec" onclick="openEditContenido('${p.id}')">✏️</button>
+    </div>`).join(''):'<div class="empty">Sin piezas de contenido registradas.</div>';
+}
+
+function switchDTab(tab){
+  document.querySelectorAll('.dtab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.dpanel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('dp-'+tab).classList.add('active');
+  document.querySelectorAll('.dtab').forEach(b=>{
+    const txt=b.textContent.toLowerCase();
+    if((tab==='gestion'&&txt.includes('gest'))||(tab==='contenidodet'&&txt.includes('cont')))b.classList.add('active');
+  });
+}
+
+// ── ACUERDOS ────────────────────────────────────────────────
+async function loadAcuerdos(){
+  const list=document.getElementById('acuerdosList');
+  try{
+    localAcuerdos=await apiFetch('/api/acuerdos');
+    if(!localAcuerdos.length){list.innerHTML='<div class="empty">Sin acuerdos registrados.</div>';return;}
+    list.innerHTML=localAcuerdos.map(a=>{
+      const c=localClients.find(x=>x.id===a.clientId);
+      return `<div class="titem" style="margin-bottom:7px;">
+        <div class="ticon" style="background:var(--blue-dim)">🤝</div>
+        <div class="tinfo">
+          <div class="tname">${c?c.name:'Cliente'} — ${a.platform}</div>
+          <div class="tmeta">Diario: ${a.daily} · Semanal: ${a.weekly} · Mensual: ${a.monthly}${a.contentTypes?' · Tipos: '+a.contentTypes:''}</div>
+          <div class="tmeta">${a.startDate?a.startDate+' → '+(a.endDate||'indefinido'):''} ${a.notes?'· '+a.notes:''}</div>
+        </div>
+        <button class="btn xs sec" onclick="doDeleteAcuerdo('${a.id}')">🗑</button>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML=`<div class="empty">${e.message}</div>`;}
+}
+async function doSaveAcuerdo(){
+  const clientId=document.getElementById('a-client').value;
+  const platform=document.getElementById('a-platform').value;
+  const daily=parseInt(document.getElementById('a-daily').value)||0;
+  const weekly=parseInt(document.getElementById('a-weekly').value)||0;
+  const monthly=parseInt(document.getElementById('a-monthly').value)||0;
+  const startDate=document.getElementById('a-start').value;
+  const endDate=document.getElementById('a-end').value;
+  const notes=document.getElementById('a-notes').value.trim();
+  const contentTypes=[...document.querySelectorAll('#a-ctypes .ctbtn.sel')].map(b=>b.dataset.val).join(', ');
+  try{
+    await apiFetch('/api/acuerdos',{method:'POST',body:JSON.stringify({clientId,platform,daily,weekly,monthly,contentTypes,startDate:startDate||null,endDate:endDate||null,notes})});
+    closeModal('modalAcuerdo');
+    showToast('Acuerdo guardado ✓','ok');
+    document.querySelectorAll('#a-ctypes .ctbtn').forEach(b=>b.classList.remove('sel'));
+    await loadAcuerdos();
+  }catch(e){showToast(e.message,'err');}
+}
+async function doDeleteAcuerdo(id){
+  if(!confirm('¿Eliminar este acuerdo?'))return;
+  try{await apiFetch('/api/acuerdos/'+id,{method:'DELETE'});showToast('Acuerdo eliminado','ok');await loadAcuerdos();}
+  catch(e){showToast(e.message,'err');}
+}
+
+// ── CONTENIDO ───────────────────────────────────────────────
+async function loadContenido(){
+  let piezas=[];
+  const filterClient=document.getElementById('contenidoFilter').value;
+  const url='/api/contenido'+(filterClient?'?clientId='+filterClient:'');
+  try{piezas=localContenido=await apiFetch(url);}
+  catch(e){document.getElementById('contenidoList').innerHTML=`<div class="empty">${e.message}</div>`;return;}
+  const list=document.getElementById('contenidoList');
+  if(!piezas.length){list.innerHTML='<div class="empty">Sin piezas de contenido.</div>';return;}
+  list.innerHTML=piezas.map(p=>{
+    const c=localClients.find(x=>x.id===p.clientId);
+    return `<div class="titem" style="margin-bottom:7px;">
+      <div class="ticon" style="background:var(--accent-dim)">${p.type==='Video'?'🎬':p.type==='Foto'?'📷':p.type==='Reel'?'🎞':p.type==='Historia'?'⏱':'📝'}</div>
+      <div class="tinfo">
+        <div class="tname">${p.name} <span style="font-size:10px;color:var(--muted)">— ${p.platform||''}</span></div>
+        <div class="tmeta">${c?c.name:'—'} · ${p.type} · Vence: ${p.due||'—'}${p.description?' · '+p.description.substring(0,40)+'...':''}</div>
+        ${p.reply?`<div class="tmeta" style="color:var(--green);">💬 ${p.reply.substring(0,60)}</div>`:''}
+      </div>
+      <span class="tst ${ST_CLS[p.status]||'st-pending'}">${ST_LABELS[p.status]||p.status}</span>
+      <select style="font-size:10px;padding:3px 6px;width:auto;background:var(--surface2);border-color:var(--border);" onchange="quickStatusUpdate('${p.id}',this.value)">
+        ${['agreed','reminded','replied','inprod','delivered','published'].map(s=>`<option value="${s}"${p.status===s?' selected':''}>${ST_LABELS[s]}</option>`).join('')}
+      </select>
+      <button class="btn xs sec" onclick="openEditContenido('${p.id}')">✏️</button>
+      <button class="btn xs sec" onclick="doDeleteContenido('${p.id}')">🗑</button>
+    </div>`;
+  }).join('');
+}
+async function quickStatusUpdate(id,status){
+  try{await apiFetch('/api/contenido/'+id+'/status',{method:'PATCH',body:JSON.stringify({status})});showToast('Estado actualizado ✓','ok');}
+  catch(e){showToast(e.message,'err');}
+}
+function openAddContenidoForClient(){
+  document.getElementById('co-id').value='';
+  ['co-name','co-desc','co-reply','co-due'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  if(currentDetailClientId){
+    populateSelects();
+    setTimeout(()=>{document.getElementById('co-client').value=currentDetailClientId;},50);
+  }
+  openModal('modalContenido');
+}
+function openEditContenido(id){
+  const p=localContenido.find(x=>x.id===id); if(!p)return;
+  document.getElementById('co-id').value=p.id;
+  document.getElementById('co-client').value=p.clientId;
+  document.getElementById('co-platform').value=p.platform||'Instagram';
+  document.getElementById('co-type').value=p.type;
+  document.getElementById('co-name').value=p.name;
+  document.getElementById('co-status').value=p.status;
+  document.getElementById('co-due').value=p.due||'';
+  document.getElementById('co-desc').value=p.description||'';
+  document.getElementById('co-reply').value=p.reply||'';
+  openModal('modalContenido');
+}
+async function doSaveContenido(){
+  const id=document.getElementById('co-id').value;
+  const body={
+    clientId:document.getElementById('co-client').value,
+    platform:document.getElementById('co-platform').value,
+    type:document.getElementById('co-type').value,
+    name:document.getElementById('co-name').value.trim(),
+    status:document.getElementById('co-status').value,
+    due:document.getElementById('co-due').value||null,
+    description:document.getElementById('co-desc').value.trim(),
+    reply:document.getElementById('co-reply').value.trim(),
+  };
+  if(!body.name){showToast('El nombre es obligatorio','err');return;}
+  try{
+    if(id) await apiFetch('/api/contenido/'+id,{method:'PUT',body:JSON.stringify(body)});
+    else   await apiFetch('/api/contenido',{method:'POST',body:JSON.stringify(body)});
+    closeModal('modalContenido');
+    showToast('Contenido guardado ✓','ok');
+    await loadContenido();
+    if(currentDetailClientId){const c=localClients.find(x=>x.id===currentDetailClientId);if(c)renderDetContenido(c);}
+  }catch(e){showToast(e.message,'err');}
+}
+async function doDeleteContenido(id){
+  if(!confirm('¿Eliminar esta pieza?'))return;
+  try{await apiFetch('/api/contenido/'+id,{method:'DELETE'});showToast('Pieza eliminada','ok');await loadContenido();}
+  catch(e){showToast(e.message,'err');}
+}
+
+// ── SEGUIMIENTO ─────────────────────────────────────────────
+async function loadSeguimiento(){
+  const list=document.getElementById('seguimientoList');
+  if(!localClients.length){list.innerHTML='<div class="empty">Sin clientes.</div>';return;}
+  let allContenido=[];
+  try{allContenido=await apiFetch('/api/contenido');}catch{}
+  list.innerHTML=localClients.map((c,i)=>{
+    const acuerdo=localAcuerdos.find(a=>a.clientId===c.id);
+    const piezas=allContenido.filter(p=>p.clientId===c.id);
+    const msgs=localHistory.filter(h=>h.clientId===c.id);
+    const replied=msgs.filter(h=>h.replied);
+    const delivered=piezas.filter(p=>p.status==='delivered'||p.status==='published');
+    const total=acuerdo?parseInt(acuerdo.monthly)||0:0;
+    const pct=total>0?Math.min(100,Math.round(delivered.length/total*100)):0;
+    const col=colFor(i);
+    return `<div class="card" style="margin-bottom:12px;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+        <div class="cavatar" style="background:${col}22;color:${col};width:36px;height:36px;font-size:12px;">${getInit(c.name)}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:500;">${c.name}</div>
+          <div style="font-size:11px;color:var(--muted);">${acuerdo?acuerdo.platform+' · '+acuerdo.monthly+' piezas/mes':'Sin acuerdo activo'}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;">
+          <span class="pill pb">📨 ${msgs.length} enviados</span>
+          <span class="pill pg">💬 ${replied.length} resp.</span>
+          <span class="pill pa">🎬 ${delivered.length}/${total||piezas.length} entregas</span>
+        </div>
+        <button class="btn xs" onclick="openDetalle('${c.id}')">Ver detalle</button>
+      </div>
+      ${total>0?`<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:10px;color:var(--muted);margin-top:4px;">${pct}% del acuerdo mensual completado</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── DASHBOARD ───────────────────────────────────────────────
+async function refreshDash(){
+  try{
+    const [summary,history,allContenido]=await Promise.all([
+      apiFetch('/api/summary'),
+      apiFetch('/api/messages/history'),
+      apiFetch('/api/contenido'),
+    ]);
+    localHistory=history;
+    localContenido=allContenido;
+
+    document.getElementById('dashStats').innerHTML=`
+      <div class="stat"><div class="stat-num" style="color:var(--accent)">${summary.totalClients}</div><div class="stat-label">Clientes</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--green)">${summary.totalMessages}</div><div class="stat-label">Mensajes enviados</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--blue)">${summary.repliedMessages}</div><div class="stat-label">Respuestas</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--amber)">${summary.pendingContenido}</div><div class="stat-label">Contenido pendiente</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--red)">${summary.activeAcuerdos}</div><div class="stat-label">Acuerdos activos</div></div>
+      <div class="stat"><div class="stat-num" style="color:var(--muted)">${summary.scheduledPending}</div><div class="stat-label">Envíos programados</div></div>
+    `;
+
+    const activeClients=localClients.filter(c=>localAcuerdos.find(a=>a.clientId===c.id));
+    document.getElementById('dashActiveClients').innerHTML=activeClients.length?
+      activeClients.map((c,i)=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);">
+        <div class="cavatar" style="width:28px;height:28px;font-size:10px;background:${colFor(i)}22;color:${colFor(i)}">${getInit(c.name)}</div>
+        <div style="flex:1;font-size:12px;">${c.name}</div>
+        <button class="btn xs sec" onclick="openDetalle('${c.id}')">Ver</button>
+      </div>`).join(''):
+      '<div class="empty" style="padding:14px;">Sin acuerdos activos.</div>';
+
+    const pendingContent=allContenido.filter(p=>!['published','delivered'].includes(p.status)).slice(0,8);
+    document.getElementById('dashPendingContent').innerHTML=pendingContent.length?
+      pendingContent.map(p=>{
+        const c=localClients.find(x=>x.id===p.clientId);
+        return `<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);">
+          <div style="font-size:13px;">${p.type==='Video'?'🎬':p.type==='Foto'?'📷':'🎞'}</div>
+          <div style="flex:1;min-width:0;">
+            <div style="font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+            <div style="font-size:10px;color:var(--muted);">${c?c.name:'—'}</div>
+          </div>
+          <span class="tst ${ST_CLS[p.status]||'st-pending'}" style="font-size:9px;">${ST_LABELS[p.status]||p.status}</span>
+        </div>`;
+      }).join(''):
+      '<div class="empty" style="padding:14px;">¡Todo al día! 🎉</div>';
+
+    document.getElementById('dashRecent').innerHTML=history.slice(0,6).map(h=>{
+      const isGmail=h.channel==='gmail';
+      const time=h.createdAt?new Date(h.createdAt).toLocaleString('es-CL',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+      return `<div class="hitem" style="margin-bottom:6px;">
+        <div class="hch" style="background:${isGmail?'var(--red-dim)':'var(--green-dim)'}">${isGmail?'✉️':'💬'}</div>
+        <div class="hinfo">
+          <div class="hmain">${h.subject||h.preview||'Mensaje'}</div>
+          <div class="hsub">${h.clientName||h.to} · ${time}</div>
+        </div>
+        ${h.replied?'<span class="replied-badge rb-yes">✓ Resp.</span>':''}
+      </div>`;
+    }).join('')||'<div class="empty">Sin mensajes recientes.</div>';
+
+  }catch(e){
+    document.getElementById('dashStats').innerHTML=`<div class="empty" style="grid-column:1/-1;">${e.message}</div>`;
+  }
+}
+
+// ── SEND ────────────────────────────────────────────────────
+function selCT(btn){
+  document.querySelectorAll('.ctbtn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel'); selCType_val=btn.dataset.val;
+}
+function getCInfo(){
+  const sel=document.getElementById('contentName').value;
+  const custom=document.getElementById('contentNameCustom').value.trim();
+  return{ctype:selCType_val,cname:custom||sel,platform:document.getElementById('contentPlatform').value};
+}
+const TPLS={
+  gmail:{
+    create:{subject:'Recordatorio: {ctype} "{cname}" — {platform}',body:'Hola {nombre},\n\nTe escribimos para recordarte que necesitamos el {ctype} "{cname}" para {platform} esta semana.\n\n¿Cuándo lo tendrás listo?\n\nSaludos,\nTu Community Manager'},
+    send:{subject:'Pendiente: Envío de {ctype} "{cname}"',body:'Hola {nombre},\n\nAún estamos esperando el {ctype} "{cname}" para {platform}. Por favor envíanoslo a la brevedad para no atrasar la publicación.\n\nGracias!'},
+    desc:{subject:'Información necesaria para "{cname}"',body:'Hola {nombre},\n\nNecesitamos la descripción e información clave para el {ctype} "{cname}" de {platform}.\n\n¿Puedes enviárnosla hoy?'},
+    approve:{subject:'Aprobación pendiente: {ctype} "{cname}"',body:'Hola {nombre},\n\nEl {ctype} "{cname}" está listo para tu revisión en {platform}. Por favor apruébalo o envíanos tus comentarios.\n\n¡Estamos esperando tu respuesta!'},
+    followup:{subject:'Seguimiento: "{cname}"',body:'Hola {nombre},\n\nHacemos seguimiento sobre el {ctype} "{cname}" para {platform}. ¿Hay algo en lo que podamos ayudarte para avanzar?\n\nQuedamos atentos!'},
+  },
+  wa:{
+    create:{body:'Hola {nombre} 👋 Recordatorio: necesitamos el {ctype} "{cname}" para {platform} esta semana. ¿Cuándo lo tienes listo? 🎬'},
+    send:{body:'Hola {nombre}! 📤 Aún esperamos el {ctype} "{cname}" para {platform}. Por favor envíanoslo cuando puedas. Gracias!'},
+    desc:{body:'Hola {nombre} 📝 Necesitamos la descripción del {ctype} "{cname}" para {platform}. ¿Nos la mandas hoy?'},
+    approve:{body:'Hola {nombre} ✅ Tu {ctype} "{cname}" está listo para revisión en {platform}. ¡Por favor apruébalo o envíanos comentarios!'},
+    followup:{body:'Hola {nombre} 🔁 Seguimiento sobre "{cname}" para {platform}. ¿Cómo va? 😊'},
+  }
+};
+function rTpl(s,n,ct,cn,pl){
+  return s.replace(/\{nombre\}/g,n||'cliente').replace(/\{ctype\}/g,ct||'contenido').replace(/\{cname\}/g,cn||'sin título').replace(/\{platform\}/g,pl||'redes sociales');
+}
+function setTpl(ch,key){
+  const t=TPLS[ch][key]; if(!t)return;
+  const sel=document.getElementById(ch+'-client').value;
+  const c=localClients.find(x=>x.id===sel);
+  const {ctype,cname,platform}=getCInfo();
+  const n=c?c.name.split(' ')[0]:'';
+  if(ch==='gmail'){
+    document.getElementById('gmail-subject').value=rTpl(t.subject,n,ctype,cname,platform);
+    document.getElementById('gmail-body').value=rTpl(t.body,n,ctype,cname,platform);
+  }else{
+    document.getElementById('wa-body').value=rTpl(t.body,n,ctype,cname,platform);
+  }
+}
+function selRec(ch,btn){
+  document.getElementById(ch+'-recgrid').querySelectorAll('.recbtn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel'); recSt[ch]=btn.dataset.val;
+  document.getElementById(ch+'-customdays').classList.toggle('show',btn.dataset.val==='custom');
+}
+function togDow(btn){btn.classList.toggle('sel');}
+function getRec(ch){
+  const v=recSt[ch]; if(v==='none')return null;
+  if(v==='custom'){const days=[...document.getElementById(ch+'-customdays').querySelectorAll('.dowbtn.sel')].map(b=>parseInt(b.dataset.day));return{type:'custom',days};}
+  return{type:v};
+}
+async function doSend(ch){
+  const btnId=ch==='gmail'?'btnGmail':'btnWA';
+  const btn=document.getElementById(btnId);
+  const clientId=document.getElementById(ch+'-client').value;
+  const body=document.getElementById(ch+'-body').value.trim();
+  const sched=document.getElementById(ch+'-schedule').value;
+  const subject=ch==='gmail'?document.getElementById('gmail-subject').value.trim():null;
+  const rec=getRec(ch);
+  const {ctype,cname,platform}=getCInfo();
+  if(!body){showToast('Escribe el mensaje primero','err');return;}
+  if(ch==='gmail'&&!subject){showToast('El asunto es obligatorio','err');return;}
+  btn.disabled=true; btn.classList.add('loading');
+  try{
+    const apiChannel=ch==='wa'?'whatsapp':'gmail';
+    if(sched){
+      await apiFetch('/api/messages/schedule',{method:'POST',body:JSON.stringify({
+        channel:apiChannel,clientId,subject,body,
+        scheduledAt:new Date(sched).toISOString(),
+        recurrence:rec,contentType:ctype,contentName:cname,platform
+      })});
+      showToast(rec?'📅 Envío recurrente programado ✓':'📅 Envío programado ✓','ok');
+    }else{
+      await apiFetch('/api/messages/'+apiChannel,{method:'POST',body:JSON.stringify({clientId,subject,body,contentType:ctype,contentName:cname,platform})});
+      showToast(ch==='gmail'?'✉️ Email enviado ✓':'💬 WhatsApp enviado ✓','ok');
+      // Refresca historial local
+      try{localHistory=await apiFetch('/api/messages/history');}catch{}
+    }
+    document.getElementById(ch+'-body').value='';
+    if(ch==='gmail')document.getElementById('gmail-subject').value='';
+    document.getElementById(ch+'-schedule').value='';
+  }catch(e){showToast('Error: '+e.message,'err');}
+  btn.disabled=false; btn.classList.remove('loading');
+}
+
+// ── RESPUESTAS ──────────────────────────────────────────────
+function openReply(msgId){
+  document.getElementById('reply-msgid').value=msgId;
+  const now=new Date();
+  document.getElementById('reply-dt').value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('reply-content').value='';
+  openModal('modalReply');
+}
+async function doSaveReply(){
+  const msgId=document.getElementById('reply-msgid').value;
+  const dt=document.getElementById('reply-dt').value;
+  const content=document.getElementById('reply-content').value.trim();
+  if(!dt){showToast('Selecciona la fecha y hora de la respuesta','err');return;}
+  const repliedAt=new Date(dt).toLocaleString('es-CL',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+  try{
+    await apiFetch('/api/messages/history/'+msgId+'/reply',{method:'PUT',body:JSON.stringify({repliedAt,replyContent:content})});
+    closeModal('modalReply');
+    showToast('Respuesta registrada ✓','ok');
+    localHistory=await apiFetch('/api/messages/history');
+    if(currentDetailClientId){const c=localClients.find(x=>x.id===currentDetailClientId);if(c)renderDetGestion(c);}
+  }catch(e){showToast(e.message,'err');}
+}
+
+// ── HISTORIAL ───────────────────────────────────────────────
+async function loadHistory(){
+  const list=document.getElementById('historyList');
+  try{
+    localHistory=await apiFetch('/api/messages/history');
+    if(!localHistory.length){list.innerHTML='<div class="empty">Sin historial aún.</div>';return;}
+    list.innerHTML=localHistory.map(h=>{
+      const isGmail=h.channel==='gmail';
+      const time=h.createdAt?new Date(h.createdAt).toLocaleString('es-CL',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+      const cinfo=[h.contentType,h.contentName].filter(Boolean).join(' · ');
+      return `<div class="hitem">
+        <div class="hch" style="background:${isGmail?'var(--red-dim)':'var(--green-dim)'}">${isGmail?'✉️':'💬'}</div>
+        <div class="hinfo">
+          <div class="hmain">${h.subject||h.preview||'Mensaje'}</div>
+          <div class="hsub">${h.clientName||h.to}${cinfo?' · '+cinfo:''} · ${time}</div>
+        </div>
+        ${h.replied
+          ?`<span class="replied-badge rb-yes">✓ ${h.repliedAt}</span>`
+          :`<button class="btn xs sec" onclick="openReply('${h.id}')">+ Respuesta</button>`}
+        <div class="htime">${time}</div>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML=`<div class="empty">${e.message}</div>`;}
+}
+
+// ── PROGRAMADOS ─────────────────────────────────────────────
+async function loadScheduled(){
+  const list=document.getElementById('schedList');
+  try{
+    localScheduled=await apiFetch('/api/messages/schedule');
+    const pending=localScheduled.filter(m=>m.status==='scheduled');
+    if(!pending.length){list.innerHTML='<div class="empty">No hay envíos programados pendientes.</div>';return;}
+    list.innerHTML=pending.map(m=>{
+      const isGmail=m.channel==='gmail';
+      const time=new Date(m.scheduledAt).toLocaleString('es-CL',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+      const recLabel=m.recurrence?RL[m.recurrence.type]||m.recurrence.type:null;
+      const cinfo=[m.contentType,m.contentName].filter(Boolean).join(' · ');
+      return `<div class="schi">
+        <div class="hch" style="background:${isGmail?'var(--red-dim)':'var(--green-dim)'}">${isGmail?'✉️':'💬'}</div>
+        <div class="schinfo">
+          <div class="schmain">${m.subject||m.body.substring(0,55)+'...'}</div>
+          <div class="schsub">${m.clientName||m.to} · ${time}${cinfo?' · '+cinfo:''}</div>
+          ${recLabel?`<span class="recbadge">↻ ${recLabel}</span>`:''}
+        </div>
+        <button class="btn xs sec" onclick="cancelSched('${m.id}')">✕</button>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML=`<div class="empty">${e.message}</div>`;}
+}
+async function cancelSched(id){
+  if(!confirm('¿Cancelar este envío?'))return;
+  try{await apiFetch('/api/messages/schedule/'+id,{method:'DELETE'});showToast('Cancelado','ok');loadScheduled();}
+  catch(e){showToast(e.message,'err');}
+}
+
+// ── CALENDARIO ──────────────────────────────────────────────
+function renderCal(){
+  const y=calDate.getFullYear(),m=calDate.getMonth();
+  document.getElementById('calMonth').textContent=MONTHS[m]+' '+y;
+  document.getElementById('calDows').innerHTML=DAYS.map(d=>`<div class="caldow">${d}</div>`).join('');
+  const first=new Date(y,m,1),last=new Date(y,m+1,0);
+  const today=new Date();
+  const allEvs=[
+    ...localHistory.map(h=>({date:h.createdAt,ch:h.channel,label:h.subject||h.preview||'Msg',type:'sent'})),
+    ...(localScheduled||[]).filter(s=>s.status==='scheduled').map(s=>({date:s.scheduledAt,ch:s.channel,label:s.subject||s.body.substring(0,25),type:'sched'}))
+  ];
+  let html='';
+  for(let i=0;i<first.getDay();i++){const d=new Date(y,m,1-first.getDay()+i);html+=`<div class="calday otherm"><div class="daynum">${d.getDate()}</div></div>`;}
+  for(let d=1;d<=last.getDate();d++){
+    const isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
+    const ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const evs=allEvs.filter(e=>e.date&&e.date.startsWith(ds));
+    const evh=evs.slice(0,3).map(e=>`<div class="cev ${e.type==='sched'?'ev-sched':e.ch==='gmail'?'ev-gmail':'ev-wa'}">${e.label}</div>`).join('');
+    const more=evs.length>3?`<div style="font-size:9px;color:var(--muted)">+${evs.length-3}</div>`:'';
+    html+=`<div class="calday${isT?' today':''}" onclick="openCalModalDate('${ds}')"><div class="daynum">${d}</div>${evh}${more}</div>`;
+  }
+  const rem=(7-(first.getDay()+last.getDate())%7)%7;
+  for(let i=1;i<=rem;i++)html+=`<div class="calday otherm"><div class="daynum">${i}</div></div>`;
+  document.getElementById('calGrid').innerHTML=html;
+}
+function calMove(dir){calDate=new Date(calDate.getFullYear(),calDate.getMonth()+dir,1);renderCal();}
+function openCalModal(){const n=new Date();document.getElementById('cal-dt').value=new Date(n.getTime()-n.getTimezoneOffset()*60000).toISOString().slice(0,16);populateSelects();openModal('modalCalSend');}
+function openCalModalDate(ds){document.getElementById('cal-dt').value=ds+'T09:00';document.getElementById('calTitle').textContent='Programar — '+ds;populateSelects();openModal('modalCalSend');}
+async function doCalSend(){
+  const dt=document.getElementById('cal-dt').value;
+  const channel=document.getElementById('cal-channel').value;
+  const clientId=document.getElementById('cal-client').value;
+  const ctype=document.getElementById('cal-ctype').value;
+  const cname=document.getElementById('cal-cname').value.trim();
+  const subject=document.getElementById('cal-subject').value.trim();
+  const body=document.getElementById('cal-body').value.trim();
+  if(!dt||!body){showToast('Fecha y mensaje son obligatorios','err');return;}
+  try{
+    await apiFetch('/api/messages/schedule',{method:'POST',body:JSON.stringify({
+      channel:channel==='wa'?'whatsapp':'gmail',clientId,subject,body,
+      scheduledAt:new Date(dt).toISOString(),contentType:ctype,contentName:cname
+    })});
+    closeModal('modalCalSend');
+    showToast('📅 Programado desde calendario ✓','ok');
+    localScheduled=await apiFetch('/api/messages/schedule');
+    renderCal();
+  }catch(e){showToast('Error: '+e.message,'err');}
+}
+
+// ── HELPERS ─────────────────────────────────────────────────
+function populatePubClientSelect() {
+  const selects = [
+    document.getElementById('pubClientFilter'),
+    document.getElementById('pub-client'),
+  ];
+  selects.forEach(sel => {
+    if (!sel) return;
+    const prev = sel.value;
+    const isFilter = sel.id === 'pubClientFilter';
+    sel.innerHTML = isFilter ? '<option value="">Todos los clientes</option>' : '';
+    localClients.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id; opt.textContent = c.name;
+      sel.appendChild(opt);
+    });
+    sel.value = prev;
+  });
+}
+
+function populateSelects(){
+  populatePubClientSelect();
+  const opts=localClients.map(c=>`<option value="${c.id}">${c.name}</option>`).join('');
+  const fb='<option>— Sin clientes —</option>';
+  ['gmail-client','wa-client','a-client','co-client','cal-client','contenidoFilter'].forEach(id=>{
+    const el=document.getElementById(id); if(!el)return;
+    el.innerHTML=id==='contenidoFilter'?'<option value="">Todos los clientes</option>'+opts:(opts||fb);
+  });
+  // Selects de módulos v4.0 y v4.1
+  ['p-client','up-client','r-client','auditClientFilter','respClientFilter','materialClientFilter',
+   'credClientFilter','statClientFilter','cred-client','stat-client'].forEach(id=>{
+    const el=document.getElementById(id); if(!el)return;
+    const hasAll=id.endsWith('Filter');
+    el.innerHTML=(hasAll?'<option value="">Todos los clientes</option>':'')+opts;
+  });
+}
+function quickSend(clientId,ch){
+  ST('enviar'); SST(ch);
+  setTimeout(()=>{populateSelects();document.getElementById(ch+'-client').value=clientId;},80);
+}
+function ST(tab){
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  const sec=document.getElementById('sec-'+tab); if(sec)sec.classList.add('active');
+  document.querySelectorAll('.nb').forEach(b=>{
+    const txt=b.textContent.trim().toLowerCase();
+    if(txt.startsWith(tab.substring(0,5))||txt.includes(tab.substring(0,5)))b.classList.add('active');
+  });
+  const tabActions={
+    historial:loadHistory, programados:loadScheduled,
+    acuerdos:()=>{loadAcuerdos();populateSelects();},
+    contenido:()=>{loadContenido();populateSelects();},
+    seguimiento:loadSeguimiento, dashboard:refreshDash,
+    calendario:async()=>{await loadHistory();await loadScheduled();renderCal();},
+    enviar:populateSelects,
+    propuestas:()=>{loadPropuestas();populateSelects();},
+    materiales:()=>{loadMateriales();populateSelects();},
+    respuestas:()=>{loadRespuestas();populateSelects();},
+    auditlog:()=>{loadAudit();populateSelects();},
+    credenciales:()=>{loadCredenciales();populateSelects();},
+    estadisticas:()=>{loadEstadisticas();populateSelects();},
+    publicaciones:()=>{loadPublicaciones();populateSelects();},
+  };
+  if(tabActions[tab])tabActions[tab]();
+}
+function SST(ch){
+  document.querySelectorAll('.stab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.spanel').forEach(p=>p.classList.remove('active'));
+  const idx={gmail:0,wa:1};
+  const tabs=document.querySelectorAll('.stab');
+  if(tabs[idx[ch]])tabs[idx[ch]].classList.add('active');
+  const panel=document.getElementById('sp-'+ch);
+  if(panel)panel.classList.add('active');
+}
+function openModal(id){document.getElementById(id).classList.add('open');populateSelects();}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function showToast(msg,type=''){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='toast',3500);
+}
+
+async function loadAll(){
+  await loadClients();
+  try{
+    [localAcuerdos,localHistory,localScheduled]=await Promise.all([
+      apiFetch('/api/acuerdos'),
+      apiFetch('/api/messages/history'),
+      apiFetch('/api/messages/schedule'),
+    ]);
+  }catch{}
+  refreshDash();
+}
+
+
+// ── PROPUESTAS ───────────────────────────────────────────────
+const PROP_STATUS_LABEL = {draft:'Borrador',sent:'Enviada',in_review:'En revisión',approved:'Aprobada',rejected:'Rechazada',cancelled:'Cancelada'};
+const PROP_STATUS_CLS   = {draft:'st-pending',sent:'st-reminded',in_review:'st-replied',approved:'st-delivered',rejected:'st-overdue',cancelled:'st-pending'};
+
+async function loadPropuestas(){
+  const list=document.getElementById('propuestasList');
+  try{
+    const props=await apiFetch('/api/propuestas');
+    if(!props.length){list.innerHTML='<div class="empty">Sin propuestas. Crea una con el botón.</div>';return;}
+    list.innerHTML=props.map(p=>{
+      const c=localClients.find(x=>x.id===p.clientId);
+      const val=p.monthlyValue?new Intl.NumberFormat('es-CL').format(p.monthlyValue)+' '+p.currency+'/mes':'Sin valor';
+      return `<div class="titem" style="margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <div class="ticon" style="background:var(--accent-dim)">📋</div>
+        <div class="tinfo">
+          <div class="tname">${p.plan||'Propuesta'} — ${c?c.name:'Cliente'}</div>
+          <div class="tmeta">${val} · ${p.contractMonths||3} meses · Enviada: ${p.sentDate||'—'} · Aprobada: ${p.approvalDate||'—'} · Inicio: ${p.startDate||'—'}</div>
+          ${p.additionalConditions?`<div class="tmeta" style="margin-top:2px;">Condiciones: ${p.additionalConditions.substring(0,60)}${p.additionalConditions.length>60?'...':''}</div>`:''}
+        </div>
+        <span class="tst ${PROP_STATUS_CLS[p.status]||'st-pending'}">${PROP_STATUS_LABEL[p.status]||p.status}</span>
+        <select style="font-size:10px;padding:3px 6px;width:auto;background:var(--surface2);border-color:var(--border);" onchange="quickPropStatus('${p.id}',this.value)">
+          ${Object.entries(PROP_STATUS_LABEL).map(([v,l])=>`<option value="${v}"${p.status===v?' selected':''}>${l}</option>`).join('')}
+        </select>
+        <button class="btn xs sec" onclick="openEditPropuesta('${p.id}')">✏️</button>
+        <button class="btn xs sec" onclick="doDeletePropuesta('${p.id}')">🗑</button>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML=`<div class="empty">${e.message}</div>`;}
+}
+
+function openAddPropuesta(){
+  document.getElementById('mPropTitle').textContent='Nueva propuesta de servicio';
+  document.getElementById('p-id').value='';
+  ['p-plan','p-value','p-sentdate','p-reviewdate','p-approvaldate','p-startdate','p-conditions','p-comments','p-internal'].forEach(id=>{
+    const el=document.getElementById(id);if(el)el.value='';
+  });
+  document.getElementById('p-months').value='3';
+  document.getElementById('p-daily').value='0';
+  document.getElementById('p-weekly').value='0';
+  document.getElementById('p-monthly').value='0';
+  document.getElementById('p-currency').value='CLP';
+  document.querySelectorAll('#p-platforms .ctbtn, #p-ctypes .ctbtn').forEach(b=>b.classList.remove('sel'));
+  openModal('modalPropuesta');
+}
+function openEditPropuesta(id){
+  apiFetch('/api/propuestas/'+id).then(p=>{
+    document.getElementById('mPropTitle').textContent='Editar propuesta';
+    document.getElementById('p-id').value=p.id;
+    document.getElementById('p-client').value=p.clientId;
+    document.getElementById('p-plan').value=p.plan||'';
+    document.getElementById('p-value').value=p.monthlyValue||'';
+    document.getElementById('p-currency').value=p.currency||'CLP';
+    document.getElementById('p-months').value=p.contractMonths||3;
+    document.getElementById('p-daily').value=p.contentQtyDaily||0;
+    document.getElementById('p-weekly').value=p.contentQtyWeekly||0;
+    document.getElementById('p-monthly').value=p.contentQtyMonthly||0;
+    document.getElementById('p-sentdate').value=p.sentDate||'';
+    document.getElementById('p-reviewdate').value=p.reviewDate||'';
+    document.getElementById('p-approvaldate').value=p.approvalDate||'';
+    document.getElementById('p-startdate').value=p.startDate||'';
+    document.getElementById('p-conditions').value=p.additionalConditions||'';
+    document.getElementById('p-comments').value=p.comments||'';
+    document.getElementById('p-internal').value=p.internalNotes||'';
+    const plats=p.platforms||[];
+    const ctypes=p.contentTypes||[];
+    document.querySelectorAll('#p-platforms .ctbtn').forEach(b=>b.classList.toggle('sel',plats.includes(b.dataset.val)));
+    document.querySelectorAll('#p-ctypes .ctbtn').forEach(b=>b.classList.toggle('sel',ctypes.includes(b.dataset.val)));
+    openModal('modalPropuesta');
+  }).catch(e=>showToast(e.message,'err'));
+}
+async function doSavePropuesta(){
+  const id=document.getElementById('p-id').value;
+  const body={
+    clientId:document.getElementById('p-client').value,
+    plan:document.getElementById('p-plan').value.trim(),
+    monthlyValue:parseInt(document.getElementById('p-value').value)||0,
+    currency:document.getElementById('p-currency').value,
+    contractMonths:parseInt(document.getElementById('p-months').value)||3,
+    contentQtyDaily:parseInt(document.getElementById('p-daily').value)||0,
+    contentQtyWeekly:parseInt(document.getElementById('p-weekly').value)||0,
+    contentQtyMonthly:parseInt(document.getElementById('p-monthly').value)||0,
+    sentDate:document.getElementById('p-sentdate').value||null,
+    reviewDate:document.getElementById('p-reviewdate').value||null,
+    approvalDate:document.getElementById('p-approvaldate').value||null,
+    startDate:document.getElementById('p-startdate').value||null,
+    additionalConditions:document.getElementById('p-conditions').value.trim(),
+    comments:document.getElementById('p-comments').value.trim(),
+    internalNotes:document.getElementById('p-internal').value.trim(),
+    platforms:[...document.querySelectorAll('#p-platforms .ctbtn.sel')].map(b=>b.dataset.val),
+    contentTypes:[...document.querySelectorAll('#p-ctypes .ctbtn.sel')].map(b=>b.dataset.val),
+  };
+  try{
+    if(id) await apiFetch('/api/propuestas/'+id,{method:'PUT',body:JSON.stringify(body)});
+    else   await apiFetch('/api/propuestas',{method:'POST',body:JSON.stringify(body)});
+    closeModal('modalPropuesta');
+    showToast(id?'Propuesta actualizada ✓':'Propuesta creada ✓','ok');
+    loadPropuestas();
+  }catch(e){showToast(e.message,'err');}
+}
+async function quickPropStatus(id,status){
+  try{await apiFetch('/api/propuestas/'+id+'/status',{method:'PATCH',body:JSON.stringify({status})});showToast('Estado actualizado ✓','ok');}
+  catch(e){showToast(e.message,'err');}
+}
+async function doDeletePropuesta(id){
+  if(!confirm('¿Eliminar esta propuesta?'))return;
+  try{await apiFetch('/api/propuestas/'+id,{method:'DELETE'});showToast('Propuesta eliminada','ok');loadPropuestas();}
+  catch(e){showToast(e.message,'err');}
+}
+
+// ── IMPORTAR EXCEL ───────────────────────────────────────────
+function openImportExcel(){openModal('modalImportExcel');document.getElementById('excelFile').value='';document.getElementById('excelPreview').textContent='';}
+async function doImportExcel(){
+  const file=document.getElementById('excelFile').files[0];
+  if(!file){showToast('Selecciona un archivo','err');return;}
+  const preview=document.getElementById('excelPreview');
+  preview.textContent='Procesando...';
+  try{
+    // Use Papa Parse for CSV or SheetJS for xlsx
+    let rows=[];
+    if(file.name.endsWith('.csv')){
+      const text=await file.text();
+      const lines=text.split('\n').filter(l=>l.trim());
+      const headers=lines[0].split(',').map(h=>h.trim().replace(/"/g,''));
+      rows=lines.slice(1).map(line=>{
+        const vals=line.split(',').map(v=>v.trim().replace(/"/g,''));
+        const obj={};headers.forEach((h,i)=>obj[h]=vals[i]||'');return obj;
+      });
+    }else{
+      preview.textContent='Para archivos .xlsx, exporta como CSV desde Excel primero.';return;
+    }
+    if(!rows.length){preview.textContent='No se encontraron filas de datos.';return;}
+    preview.textContent=`${rows.length} filas encontradas. Importando...`;
+    const result=await apiFetch('/api/propuestas/import-excel',{method:'POST',body:JSON.stringify({rows})});
+    closeModal('modalImportExcel');
+    showToast(`✓ ${result.created} propuestas importadas${result.errors.length?' · '+result.errors.length+' errores':''}`, result.errors.length?'err':'ok');
+    loadPropuestas();
+  }catch(e){showToast(e.message,'err');preview.textContent='';}
+}
+
+// ── MATERIALES ───────────────────────────────────────────────
+async function loadMateriales(){
+  const list=document.getElementById('materialesList');
+  const clientId=document.getElementById('materialClientFilter').value;
+  try{
+    const url='/api/materiales'+(clientId?'?clientId='+clientId:'');
+    const mats=await apiFetch(url);
+    if(!mats.length){list.innerHTML='<div class="empty">Sin materiales subidos.</div>';return;}
+    list.innerHTML=mats.map(m=>{
+      const c=localClients.find(x=>x.id===m.clientId);
+      const kb=Math.round(m.size/1024);
+      const isVideo=/mp4|mov|avi|mkv|webm/i.test(m.originalName);
+      const isImg=/jpg|jpeg|png|gif|heic|webp/i.test(m.originalName);
+      const ico=isVideo?'🎬':isImg?'📷':'📄';
+      const date=new Date(m.uploadedAt||m.createdAt).toLocaleString('es-CL',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      return `<div class="titem" style="margin-bottom:7px;">
+        <div class="ticon" style="background:var(--accent-dim)">${ico}</div>
+        <div class="tinfo">
+          <div class="tname">${m.originalName}</div>
+          <div class="tmeta">${c?c.name:'—'} · ${kb}KB · Subido: ${date}${m.notes?' · '+m.notes:''}</div>
+        </div>
+        <a href="${CFG.url}/api/materiales/file/${m.id}" target="_blank" class="btn xs sec">⬇ Descargar</a>
+        <button class="btn xs sec" onclick="doDeleteMaterial('${m.id}')">🗑</button>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML=`<div class="empty">${e.message}</div>`;}
+}
+
+function openUploadMaterial(){
+  document.getElementById('up-files').value='';
+  document.getElementById('up-notes').value='';
+  populateContenidoSelect('up-contenido','');
+  openModal('modalUpload');
+}
+async function populateContenidoSelect(selectId, clientId){
+  const el=document.getElementById(selectId);
+  if(!el)return;
+  if(!clientId){el.innerHTML='<option value="">— Sin asociar —</option>';return;}
+  try{
+    const items=await apiFetch('/api/contenido?clientId='+clientId);
+    el.innerHTML='<option value="">— Sin asociar —</option>'+items.map(i=>`<option value="${i.id}">${i.name} (${i.type})</option>`).join('');
+  }catch{el.innerHTML='<option value="">— Sin asociar —</option>';}
+}
+
+async function doUploadMaterial(){
+  const btn=document.getElementById('btnUpload');
+  const clientId=document.getElementById('up-client').value;
+  const contenidoId=document.getElementById('up-contenido').value;
+  const notes=document.getElementById('up-notes').value.trim();
+  const files=document.getElementById('up-files').files;
+  if(!clientId){showToast('Selecciona un cliente','err');return;}
+  if(!files.length){showToast('Selecciona al menos un archivo','err');return;}
+  btn.disabled=true;btn.textContent='Subiendo...';
+  try{
+    const fd=new FormData();
+    fd.append('clientId',clientId);
+    if(contenidoId)fd.append('contenidoId',contenidoId);
+    if(notes)fd.append('notes',notes);
+    for(const f of files)fd.append('files',f);
+    const res=await fetch(CFG.url+'/api/materiales/upload',{
+      method:'POST',
+      headers:{Authorization:'Bearer '+SESSION.token},
+      body:fd,
+    });
+    const data=await res.json();
+    if(!res.ok)throw new Error(data.error||'Error al subir');
+    closeModal('modalUpload');
+    showToast(`✓ ${data.uploaded} archivo(s) subido(s)`,'ok');
+    loadMateriales();
+  }catch(e){showToast(e.message,'err');}
+  btn.disabled=false;btn.textContent='Subir archivos';
+}
+
+async function doDeleteMaterial(id){
+  if(!confirm('¿Eliminar este material? El archivo se eliminará del servidor.'))return;
+  try{await apiFetch('/api/materiales/'+id,{method:'DELETE'});showToast('Material eliminado','ok');loadMateriales();}
+  catch(e){showToast(e.message,'err');}
+}
+
+// ── RESPUESTAS ───────────────────────────────────────────────
+async function loadRespuestas(){
+  const list=document.getElementById('respuestasList');
+  const clientId=document.getElementById('respClientFilter').value;
+  try{
+    const url='/api/respuestas'+(clientId?'?clientId='+clientId:'');
+    const items=await apiFetch(url);
+    const chFilter=document.getElementById('respChannelFilter').value;
+    const filtered=chFilter?items.filter(r=>r.channel===chFilter):items;
+    if(!filtered.length){list.innerHTML='<div class="empty">Sin respuestas registradas.</div>';return;}
+    list.innerHTML=filtered.map(r=>{
+      const c=localClients.find(x=>x.id===r.clientId);
+      const t=new Date(r.receivedAt||r.createdAt).toLocaleString('es-CL',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      const chIco={whatsapp:'💬',gmail:'✉️',phone:'📞',presencial:'🤝',manual:'📝'}[r.channel]||'📝';
+      const autoBadge=r.autoCapture?'<span style="font-size:9px;background:var(--green-dim);color:var(--green);padding:2px 6px;border-radius:20px;margin-left:6px;">Auto</span>':'';
+      return `<div class="hitem" style="margin-bottom:7px;">
+        <div class="hch" style="background:var(--accent-dim)">${chIco}</div>
+        <div class="hinfo">
+          <div class="hmain">${r.content}</div>
+          <div class="hsub">${c?c.name:'—'} · ${r.channel} · ${t}${autoBadge}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML=`<div class="empty">${e.message}</div>`;}
+}
+
+function openAddRespuesta(){
+  const now=new Date();
+  document.getElementById('r-datetime').value=new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16);
+  document.getElementById('r-content').value='';
+  document.getElementById('r-channel').value='whatsapp';
+  openModal('modalRespuesta');
+}
+async function loadContenidoForRespuesta(){
+  const clientId=document.getElementById('r-client').value;
+  await populateContenidoSelect('r-contenido',clientId);
+}
+async function doSaveRespuesta(){
+  const clientId=document.getElementById('r-client').value;
+  const content=document.getElementById('r-content').value.trim();
+  const channel=document.getElementById('r-channel').value;
+  const dt=document.getElementById('r-datetime').value;
+  const contenidoId=document.getElementById('r-contenido').value;
+  if(!clientId||!content){showToast('Cliente y contenido son obligatorios','err');return;}
+  try{
+    await apiFetch('/api/respuestas',{method:'POST',body:JSON.stringify({
+      clientId,content,channel,
+      receivedAt:dt?new Date(dt).toISOString():new Date().toISOString(),
+      contenidoId:contenidoId||null,autoCapture:false,
+    })});
+    closeModal('modalRespuesta');
+    showToast('Respuesta registrada ✓','ok');
+    loadRespuestas();
+  }catch(e){showToast(e.message,'err');}
+}
+
+// ── AUDIT LOG ────────────────────────────────────────────────
+async function loadAudit(){
+  const list=document.getElementById('auditList');
+  const clientId=document.getElementById('auditClientFilter').value;
+  const entity=document.getElementById('auditEntityFilter').value;
+  const action=document.getElementById('auditActionFilter').value;
+  let url='/api/audit?limit=100';
+  if(clientId)url+='&clientId='+clientId;
+  if(entity)url+='&entity='+entity;
+  if(action)url+='&action='+action;
+  try{
+    const items=await apiFetch(url);
+    if(!items.length){list.innerHTML='<div class="empty">Sin eventos de auditoría.</div>';return;}
+    const actionIco={created:'➕',updated:'✏️',deleted:'🗑',sent:'📨',scheduled:'📅',cancelled:'✕',status_change:'🔄',reply_received:'💬',uploaded:'📁',startup:'🚀'};
+    const entityColor={client:'var(--accent)',propuesta:'var(--blue)',acuerdo:'var(--amber)',contenido:'var(--green)',message:'var(--red)',scheduled:'var(--amber)',respuesta:'var(--green)',material:'var(--muted)',system:'var(--muted)'};
+    list.innerHTML=items.map(e=>{
+      const t=new Date(e.timestamp).toLocaleString('es-CL',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      const c=localClients.find(x=>x.id===e.clientId);
+      const ico=actionIco[e.action]||'•';
+      const col=entityColor[e.entity]||'var(--muted)';
+      return `<div class="hitem" style="margin-bottom:5px;padding:9px 14px;">
+        <div style="width:24px;text-align:center;font-size:13px;flex-shrink:0;">${ico}</div>
+        <div class="hinfo">
+          <div class="hmain" style="font-size:11px;">${e.detail}</div>
+          <div class="hsub">${t}${c?' · '+c.name:''} · <span style="color:${col}">${e.entity}</span></div>
+        </div>
+        <div style="font-size:9px;color:var(--muted);white-space:nowrap;font-family:monospace;">${(e.entityId||'').substring(0,8)}</div>
+      </div>`;
+    }).join('');
+  }catch(e){list.innerHTML=`<div class="empty">${e.message}</div>`;}
+}
+
+
+// ════════════════════════════════════════════════════════════
+// CREDENCIALES DE REDES SOCIALES — v4.1
+// ════════════════════════════════════════════════════════════
+
+const CRED_PLATFORM_ICON  = { instagram:'📸', facebook:'👍', tiktok:'🎵', whatsapp:'💬', youtube:'▶️', otro:'🔗' };
+const CRED_PLATFORM_LABEL = { instagram:'Instagram', facebook:'Facebook', tiktok:'TikTok', whatsapp:'WhatsApp', youtube:'YouTube', otro:'Otro' };
+
+function toggleCredPass(inputId, btn) {
+  const el = document.getElementById(inputId);
+  if (el.type === 'password') { el.type = 'text'; btn.textContent = '🙈'; }
+  else { el.type = 'password'; btn.textContent = '👁'; }
+}
+
+async function loadCredenciales() {
+  const list = document.getElementById('credencialesList');
+  const clientId = document.getElementById('credClientFilter').value;
+  try {
+    const url = '/api/credenciales' + (clientId ? '?clientId=' + clientId : '');
+    const data = await apiFetch(url);
+    if (!data.length) { list.innerHTML = '<div class="empty">Sin credenciales. Agrega una con el botón.</div>'; return; }
+    list.innerHTML = data.map(c => {
+      const cl = localClients.find(x => x.id === c.clientId);
+      const icon = CRED_PLATFORM_ICON[c.platform] || '🔗';
+      const plabel = CRED_PLATFORM_LABEL[c.platform] || c.platform;
+      return `<div class="titem" style="margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <div class="ticon" style="background:var(--accent-dim);font-size:18px;">${icon}</div>
+        <div class="tinfo">
+          <div class="tname">${plabel} — ${cl ? cl.name : c.clientId}</div>
+          <div class="tmeta">Usuario: <strong>${c.username}</strong> · Contraseña: ••••••••</div>
+          ${c.notes ? `<div class="tmeta" style="margin-top:2px;">${c.notes}</div>` : ''}
+        </div>
+        <div class="tact" style="display:flex;gap:6px;flex-shrink:0;">
+          <button class="btn sm" onclick="openReveal('${c.id}')">🔐 Mostrar</button>
+          <button class="btn sec sm" onclick="openEditCredencial('${c.id}','${c.clientId}','${c.platform}',${JSON.stringify(c.username)},${JSON.stringify(c.notes||'')})">Editar</button>
+          <button class="btn sec sm" onclick="doDeleteCredencial('${c.id}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { list.innerHTML = `<div class="empty" style="color:var(--red)">Error: ${e.message}</div>`; }
+}
+
+function openReveal(credId) {
+  document.getElementById('reveal-credId').value = credId;
+  document.getElementById('reveal-adminPass').value = '';
+  document.getElementById('revealResult').style.display = 'none';
+  document.getElementById('revealPassword').value = '';
+  openModal('modalReveal');
+}
+
+async function doRevealCredencial() {
+  const credId = document.getElementById('reveal-credId').value;
+  const adminPassword = document.getElementById('reveal-adminPass').value.trim();
+  if (!adminPassword) { showToast('Ingresa tu contraseña de admin', 'warn'); return; }
+  try {
+    const res = await apiFetch('/api/credenciales/' + credId + '/reveal', {
+      method: 'POST', body: JSON.stringify({ adminPassword }),
+    });
+    document.getElementById('revealPassword').value = res.password;
+    document.getElementById('revealResult').style.display = 'block';
+    showToast('Contraseña revelada — acceso registrado en auditoría', 'ok');
+  } catch(e) { showToast('Error: ' + e.message, ''); }
+}
+
+function copyRevealPass() {
+  navigator.clipboard.writeText(document.getElementById('revealPassword').value)
+    .then(() => showToast('Contraseña copiada al portapapeles', 'ok'));
+}
+
+function openEditCredencial(id, clientId, platform, username, notes) {
+  document.getElementById('cred-id').value = id;
+  document.getElementById('cred-client').value = clientId;
+  document.getElementById('cred-platform').value = platform;
+  document.getElementById('cred-username').value = username;
+  document.getElementById('cred-notes').value = notes;
+  document.getElementById('cred-password').value = '';
+  document.querySelector('#modalCredencial h2').textContent = 'Editar credencial';
+  openModal('modalCredencial');
+}
+
+async function doSaveCredencial() {
+  const id = document.getElementById('cred-id').value;
+  const body = {
+    clientId: document.getElementById('cred-client').value,
+    platform: document.getElementById('cred-platform').value,
+    username: document.getElementById('cred-username').value.trim(),
+    password: document.getElementById('cred-password').value,
+    notes:    document.getElementById('cred-notes').value.trim(),
+  };
+  if (!body.clientId || !body.username) { showToast('Cliente y usuario son requeridos', ''); return; }
+  if (!id && !body.password) { showToast('La contraseña es requerida para nuevas credenciales', ''); return; }
+  try {
+    if (id) {
+      await apiFetch('/api/credenciales/' + id, { method: 'PUT', body: JSON.stringify(body) });
+      showToast('Credencial actualizada', 'ok');
+    } else {
+      await apiFetch('/api/credenciales', { method: 'POST', body: JSON.stringify(body) });
+      showToast('Credencial guardada y cifrada', 'ok');
+    }
+    closeModal('modalCredencial');
+    document.getElementById('cred-id').value = '';
+    document.querySelector('#modalCredencial h2').textContent = 'Nueva credencial de red social';
+    loadCredenciales();
+  } catch(e) { showToast('Error: ' + e.message, ''); }
+}
+
+async function doDeleteCredencial(id) {
+  if (!confirm('¿Eliminar esta credencial? Esta acción no se puede deshacer.')) return;
+  try {
+    await apiFetch('/api/credenciales/' + id, { method: 'DELETE' });
+    showToast('Credencial eliminada', 'ok');
+    loadCredenciales();
+  } catch(e) { showToast('Error: ' + e.message, ''); }
+}
+
+// ════════════════════════════════════════════════════════════
+// ESTADÍSTICAS DE REDES SOCIALES — v4.1
+// ════════════════════════════════════════════════════════════
+
+const STAT_PLATFORM_ICON  = { instagram:'📸', facebook:'👍', tiktok:'🎵', whatsapp:'💬', youtube:'▶️', otro:'🔗' };
+const STAT_PLATFORM_COLOR = { instagram:'#e1306c', facebook:'#1877f2', tiktok:'#010101', whatsapp:'#25d366', youtube:'#ff0000', otro:'#7c6ff7' };
+
+function fmtNum(n) { return (n === null || n === undefined) ? '—' : new Intl.NumberFormat('es-CL').format(n); }
+
+async function loadEstadisticas() {
+  const list    = document.getElementById('estadisticasList');
+  const resumen = document.getElementById('statResumen');
+  const clientId = document.getElementById('statClientFilter').value;
+  const platform = document.getElementById('statPlatformFilter').value;
+  try {
+    if (clientId) {
+      const res = await apiFetch('/api/estadisticas/resumen?clientId=' + clientId);
+      resumen.innerHTML = res.resumen.map(r => {
+        const l = r.latest; if (!l) return '';
+        const icon  = STAT_PLATFORM_ICON[r.platform]  || '📊';
+        const color = STAT_PLATFORM_COLOR[r.platform] || '#7c6ff7';
+        const delta = r.deltaFollowers !== null
+          ? `<span style="color:${r.deltaFollowers>=0?'var(--green)':'var(--red)'};">${r.deltaFollowers>=0?'+':''}${fmtNum(r.deltaFollowers)}</span>`
+          : '';
+        return `<div class="card" style="min-width:155px;flex:1;max-width:195px;border-top:3px solid ${color};padding:14px;">
+          <div style="font-size:22px;margin-bottom:4px;">${icon}</div>
+          <div style="font-weight:600;font-size:13px;margin-bottom:6px;text-transform:capitalize;">${r.platform}</div>
+          <div style="font-size:20px;font-weight:700;">${fmtNum(l.followers)}</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;">seguidores ${delta}</div>
+          <div style="font-size:12px;">ER: <strong>${l.engagementRate}%</strong></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">${l.periodStart} → ${l.periodEnd}</div>
+        </div>`;
+      }).join('');
+    } else {
+      resumen.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 0;">Selecciona un cliente para ver el resumen por plataforma.</div>';
+    }
+    let url = '/api/estadisticas?';
+    if (clientId) url += 'clientId=' + clientId + '&';
+    if (platform) url += 'platform=' + platform + '&';
+    const data = await apiFetch(url);
+    if (!data.length) { list.innerHTML = '<div class="empty">Sin registros. Agrega métricas con el botón.</div>'; return; }
+    list.innerHTML = data.map(s => {
+      const cl = localClients.find(x => x.id === s.clientId);
+      const icon = STAT_PLATFORM_ICON[s.platform] || '📊';
+      return `<div class="titem" style="margin-bottom:8px;flex-wrap:wrap;gap:8px;align-items:flex-start;">
+        <div class="ticon" style="background:var(--accent-dim);font-size:18px;">${icon}</div>
+        <div class="tinfo" style="flex:1;">
+          <div class="tname" style="text-transform:capitalize;">${s.platform} — ${cl ? cl.name : s.clientId}</div>
+          <div class="tmeta">${s.periodStart} → ${s.periodEnd} · <strong>${fmtNum(s.followers)}</strong> seg. (+${fmtNum(s.newFollowers)}) · ER: <strong>${s.engagementRate}%</strong></div>
+          <div class="tmeta" style="margin-top:4px;display:flex;gap:10px;flex-wrap:wrap;">
+            <span>👁 ${fmtNum(s.reach)}</span>
+            <span>❤️ ${fmtNum(s.likes)}</span>
+            <span>💬 ${fmtNum(s.comments)}</span>
+            <span>🔖 ${fmtNum(s.saves)}</span>
+            <span>▶️ ${fmtNum(s.views)}</span>
+            <span>📝 ${fmtNum(s.posts)} pubs</span>
+          </div>
+          ${s.notes ? `<div class="tmeta" style="margin-top:3px;font-style:italic;">${s.notes}</div>` : ''}
+        </div>
+        <div class="tact" style="display:flex;gap:6px;flex-shrink:0;">
+          <button class="btn sec sm" onclick="openEditEstadistica('${s.id}')">Editar</button>
+          <button class="btn sec sm" onclick="doDeleteEstadistica('${s.id}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { list.innerHTML = `<div class="empty" style="color:var(--red)">Error: ${e.message}</div>`; }
+}
+
+async function openEditEstadistica(id) {
+  try {
+    const data = await apiFetch('/api/estadisticas?');
+    const s = data.find(x => x.id === id); if (!s) return;
+    ['id','client','from','to','followers','newFollowers','reach','impressions','likes','comments','saves','shares','views','posts','notes']
+      .forEach(f => { const el = document.getElementById('stat-' + f); if (el) el.value = s[f === 'from' ? 'periodStart' : f === 'to' ? 'periodEnd' : f] ?? ''; });
+    document.getElementById('stat-platform').value = s.platform;
+    document.querySelector('#modalEstadistica h2').textContent = 'Editar métricas del período';
+    openModal('modalEstadistica');
+  } catch(e) { showToast('Error: ' + e.message, ''); }
+}
+
+async function doSaveEstadistica() {
+  const id = document.getElementById('stat-id').value;
+  const g = id => parseInt(document.getElementById(id).value) || 0;
+  const body = {
+    clientId: document.getElementById('stat-client').value,
+    platform: document.getElementById('stat-platform').value,
+    periodStart: document.getElementById('stat-from').value,
+    periodEnd:   document.getElementById('stat-to').value,
+    followers: g('stat-followers'), newFollowers: g('stat-newFollowers'),
+    reach: g('stat-reach'), impressions: g('stat-impressions'),
+    likes: g('stat-likes'), comments: g('stat-comments'),
+    saves: g('stat-saves'), shares: g('stat-shares'),
+    views: g('stat-views'), posts: g('stat-posts'),
+    notes: document.getElementById('stat-notes').value.trim(),
+    source: 'manual',
+  };
+  if (!body.clientId || !body.periodStart || !body.periodEnd) { showToast('Cliente y período son requeridos', ''); return; }
+  try {
+    if (id) {
+      await apiFetch('/api/estadisticas/' + id, { method: 'PUT', body: JSON.stringify(body) });
+      showToast('Métricas actualizadas', 'ok');
+    } else {
+      await apiFetch('/api/estadisticas', { method: 'POST', body: JSON.stringify(body) });
+      showToast('Métricas registradas', 'ok');
+    }
+    closeModal('modalEstadistica');
+    document.getElementById('stat-id').value = '';
+    document.querySelector('#modalEstadistica h2').textContent = 'Registrar métricas del período';
+    loadEstadisticas();
+  } catch(e) { showToast('Error: ' + e.message, ''); }
+}
+
+async function doDeleteEstadistica(id) {
+  if (!confirm('¿Eliminar este registro de estadísticas?')) return;
+  try {
+    await apiFetch('/api/estadisticas/' + id, { method: 'DELETE' });
+    showToast('Registro eliminado', 'ok');
+    loadEstadisticas();
+  } catch(e) { showToast('Error: ' + e.message, ''); }
+}
+
+
+// Startup: check if there's an active session
+(async () => {
+  loadCfg(); // FIX v4.1: cargar configuración guardada antes de verificar sesión
+  const sessionValid = loadSession() && await checkActiveSession();
+  if (sessionValid) {
+    document.getElementById('loginOverlay').classList.add('hidden');
+    loadAll();
+    checkStatus();
+  } else {
+    clearSession();
+    // Show login — but pre-fill URL if already configured
+    document.getElementById('loginOverlay').classList.remove('hidden');
+  }
+})();
+
+// ══════════════════════════════════════════════════
+// PUBLICACIONES — v4.3.0
+// ══════════════════════════════════════════════════
+
+const PUB_PLATFORM_ICON = {
+  instagram:'📸', facebook:'👤', tiktok:'🎵', youtube:'▶️', otro:'🌐'
+};
+const PUB_TYPE_LABEL = {
+  reel:'Reel', post:'Post', story:'Story', carrusel:'Carrusel', video:'Video', otro:'Otro'
+};
+
+let localPublicaciones = [];
+
+async function loadPublicaciones() {
+  const list    = document.getElementById('publicacionesList');
+  const resumen = document.getElementById('pubResumen');
+  if (!list) return;
+  const clientId    = document.getElementById('pubClientFilter').value;
+  const platform    = document.getElementById('pubPlatformFilter').value;
+  const contentType = document.getElementById('pubTypeFilter').value;
+  try {
+    if (clientId) {
+      const r = await apiFetch('/api/publicaciones/resumen?clientId=' + clientId);
+      const platforms = Object.entries(r.porPlataforma);
+      resumen.innerHTML = platforms.length ? platforms.map(([plat, total]) => {
+        const icon = PUB_PLATFORM_ICON[plat] || '🌐';
+        return `<div class="card" style="min-width:140px;flex:1;max-width:180px;padding:14px;border-top:3px solid var(--accent);">
+          <div style="font-size:22px;margin-bottom:4px;">${icon}</div>
+          <div style="font-weight:600;font-size:13px;text-transform:capitalize;margin-bottom:4px;">${plat}</div>
+          <div style="font-size:24px;font-weight:700;">${total}</div>
+          <div style="font-size:11px;color:var(--muted);">publicaciones</div>
+        </div>`;
+      }).join('') : '';
+    } else {
+      resumen.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:4px 0;">Selecciona un cliente para ver el resumen por plataforma.</div>';
+    }
+    let url = '/api/publicaciones?';
+    if (clientId)    url += 'clientId='    + clientId    + '&';
+    if (platform)    url += 'platform='    + platform    + '&';
+    if (contentType) url += 'contentType=' + contentType + '&';
+    const data = await apiFetch(url);
+    localPublicaciones = data;
+    if (!data.length) {
+      list.innerHTML = '<div class="empty">Sin publicaciones registradas. Usa el botón para agregar.</div>';
+      return;
+    }
+    list.innerHTML = data.map(p => {
+      const cl   = localClients.find(x => x.id === p.clientId);
+      const icon = PUB_PLATFORM_ICON[p.platform] || '🌐';
+      const tipo = PUB_TYPE_LABEL[p.contentType] || p.contentType;
+      const fecha = p.publishedAt ? p.publishedAt.substring(0,16).replace('T',' ') : '—';
+      return `<div class="titem" style="margin-bottom:8px;flex-wrap:wrap;gap:8px;align-items:flex-start;">
+        <div class="ticon" style="background:var(--accent-dim);font-size:20px;">${icon}</div>
+        <div class="tinfo" style="flex:1;">
+          <div class="tname">${tipo} · ${cl ? cl.name : '—'}</div>
+          <div class="tmeta">
+            <span style="text-transform:capitalize;">${p.platform}</span> ·
+            <strong>${fecha}</strong>
+            ${p.url ? ` · <a href="${p.url}" target="_blank" style="color:var(--accent);">Ver post ↗</a>` : ''}
+          </div>
+          ${p.caption ? `<div class="tmeta" style="margin-top:3px;font-style:italic;color:var(--muted);max-width:600px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">"${p.caption}"</div>` : ''}
+          ${p.notes   ? `<div class="tmeta" style="margin-top:2px;">${p.notes}</div>` : ''}
+        </div>
+        <div class="tact" style="display:flex;gap:6px;flex-shrink:0;">
+          <button class="btn sec sm" onclick="openEditPublicacion('${p.id}')">✏️</button>
+          <button class="btn sec sm" onclick="doDeletePublicacion('${p.id}')">🗑</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = `<div class="empty" style="color:var(--red)">Error: ${e.message}</div>`;
+  }
+}
+
+function openModalPublicacionNew() {
+  document.getElementById('pub-id').value          = '';
+  document.getElementById('pub-client').value      = '';
+  document.getElementById('pub-platform').value    = 'instagram';
+  document.getElementById('pub-contentType').value = 'reel';
+  document.getElementById('pub-url').value         = '';
+  document.getElementById('pub-caption').value     = '';
+  document.getElementById('pub-notes').value       = '';
+  document.getElementById('pub-contenido').value   = '';
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+  document.getElementById('pub-publishedAt').value = now.toISOString().substring(0,16);
+  document.querySelector('#modalPublicacion h2').textContent = 'Registrar publicación';
+  openModal('modalPublicacion');
+}
+
+async function openEditPublicacion(id) {
+  const p = localPublicaciones.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('pub-id').value          = p.id;
+  document.getElementById('pub-client').value      = p.clientId || '';
+  document.getElementById('pub-platform').value    = p.platform;
+  document.getElementById('pub-contentType').value = p.contentType;
+  document.getElementById('pub-url').value         = p.url || '';
+  document.getElementById('pub-caption').value     = p.caption || '';
+  document.getElementById('pub-notes').value       = p.notes || '';
+  if (p.publishedAt) {
+    const d = new Date(p.publishedAt);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    document.getElementById('pub-publishedAt').value = d.toISOString().substring(0,16);
+  }
+  await loadContenidoForPub(p.clientId);
+  document.getElementById('pub-contenido').value = p.contenidoId || '';
+  document.querySelector('#modalPublicacion h2').textContent = 'Editar publicación';
+  openModal('modalPublicacion');
+}
+
+async function loadContenidoForPub(clientId) {
+  const sel = document.getElementById('pub-contenido');
+  sel.innerHTML = '<option value="">— Sin vincular —</option>';
+  if (!clientId) return;
+  try {
+    const data = await apiFetch('/api/contenido?clientId=' + clientId);
+    data.forEach(c => {
+      const opt = document.createElement('option');
+      opt.value = c.id;
+      opt.textContent = c.name + ' (' + c.type + ')';
+      sel.appendChild(opt);
+    });
+  } catch(e) {}
+}
+
+async function doSavePublicacion() {
+  const id          = document.getElementById('pub-id').value;
+  const clientId    = document.getElementById('pub-client').value;
+  const platform    = document.getElementById('pub-platform').value;
+  const contentType = document.getElementById('pub-contentType').value;
+  const publishedAt = document.getElementById('pub-publishedAt').value;
+  const url         = document.getElementById('pub-url').value.trim();
+  const caption     = document.getElementById('pub-caption').value.trim();
+  const notes       = document.getElementById('pub-notes').value.trim();
+  const contenidoId = document.getElementById('pub-contenido').value;
+  if (!clientId)    return showToast('Selecciona un cliente', true);
+  if (!publishedAt) return showToast('La fecha de publicación es requerida', true);
+  const body = {
+    clientId, platform, contentType,
+    publishedAt: new Date(publishedAt).toISOString(),
+    url: url||null, caption: caption||null,
+    notes: notes||null, contenidoId: contenidoId||null
+  };
+  try {
+    if (id) {
+      await apiFetch('/api/publicaciones/' + id, { method: 'PUT', body: JSON.stringify(body) });
+      showToast('Publicación actualizada');
+    } else {
+      await apiFetch('/api/publicaciones', { method: 'POST', body: JSON.stringify(body) });
+      showToast('Publicación registrada');
+    }
+    closeModal('modalPublicacion');
+    loadPublicaciones();
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
+async function doDeletePublicacion(id) {
+  if (!confirm('¿Eliminar esta publicación?')) return;
+  try {
+    await apiFetch('/api/publicaciones/' + id, { method: 'DELETE' });
+    showToast('Publicación eliminada');
+    loadPublicaciones();
+  } catch(e) { showToast('Error: ' + e.message, true); }
+}
+
+</script>
+</body>
+</html>
