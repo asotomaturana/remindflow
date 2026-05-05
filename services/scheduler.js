@@ -1,7 +1,7 @@
 const cron = require('node-cron');
 const { sendEmail } = require('./gmail');
 const { sendWhatsApp } = require('./whatsapp');
-const store = require('../data/store');
+const store = require('../store');
 
 // Revisa cada minuto si hay mensajes programados listos para enviar
 cron.schedule('* * * * *', async () => {
