@@ -1,8 +1,5 @@
 require('dotenv').config();
 
-// Persistencia SQLite — ejecutar migraciones antes de arrancar
-const { runMigrations } = require('./data/migrate');
-runMigrations();
 
 const { logStartup } = require('./data/store');
 
