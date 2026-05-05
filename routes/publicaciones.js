@@ -21,7 +21,7 @@
 
 const express = require('express');
 const router  = express.Router();
-const store   = require('../data/store');
+const store   = require('../store');
 
 // ── GET /api/publicaciones ───────────────────────────────────
 // Filtros: clientId, platform, contentType, from (ISO date), to (ISO date)

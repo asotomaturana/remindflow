@@ -3,7 +3,7 @@ const router  = express.Router();
 const multer  = require('multer');
 const path    = require('path');
 const fs      = require('fs');
-const store   = require('../data/store');
+const store   = require('../store');
 
 // ── Storage config ───────────────────────────────────────────
 // Folder structure: uploads/<clientId>/<year>/<month>/<filename>

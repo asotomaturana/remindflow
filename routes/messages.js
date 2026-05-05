@@ -2,7 +2,7 @@ const express = require('express');
 const router  = express.Router();
 const { sendEmail }    = require('../services/gmail');
 const { sendWhatsApp } = require('../services/whatsapp');
-const store = require('../data/store');
+const store = require('../store');
 
 // ── Envío inmediato Gmail ────────────────────────────────────
 router.post('/gmail', async (req, res) => {

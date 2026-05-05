@@ -9,7 +9,7 @@ const express = require('express');
 const router  = express.Router();
 const { encrypt, decrypt } = require('../services/cipher');
 const { randomUUID } = require('crypto');
-const { addAudit }   = require('../data/store');
+const { addAudit }   = require('../store');
 const crypto = require('crypto');
 
 // Almacén en memoria — en producción: tabla `social_credentials` en PostgreSQL

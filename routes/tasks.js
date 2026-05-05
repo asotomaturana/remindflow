@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const store   = require('../data/store');
+const store   = require('../store');
 
 // GET /api/tasks  (opcional ?clientId=)
 router.get('/', (req, res) => {

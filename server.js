@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 
-const { logStartup } = require('./data/store');
+const { logStartup } = require('./store');
 
 const express   = require('express');
 const cors      = require('cors');
@@ -86,7 +86,7 @@ app.get('/api/status', async (req, res) => {
 });
 
 app.get('/api/summary', (req, res) => {
-  const store = require('./data/store');
+  const store = require('./store');
   const history = store.getHistory();
   res.json({
     totalClients:      store.getClients().length,

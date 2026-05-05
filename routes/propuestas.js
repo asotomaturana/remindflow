@@ -1,6 +1,6 @@
 const express = require('express');
 const router  = express.Router();
-const store   = require('../data/store');
+const store   = require('../store');
 
 const VALID_STATUSES = ['draft','sent','in_review','approved','rejected','cancelled'];
 

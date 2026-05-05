@@ -16,7 +16,7 @@
 
 const express = require('express');
 const router  = express.Router();
-const { addAudit, getClient } = require('../data/store');
+const { addAudit, getClient } = require('../store');
 const { randomUUID } = require('crypto');
 
 let estadisticas = [];
