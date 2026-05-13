@@ -1,0 +1,1187 @@
+{
+  "info": {
+    "_postman_id": "27d19074-3f25-42b3-8357-80c05ba1c72e",
+    "name": "RemindFlow API v4.3",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "48208701",
+    "_collection_link": "https://go.postman.co/collection/48208701-27d19074-3f25-42b3-8357-80c05ba1c72e?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Clientes",
+      "item": [
+        {
+          "name": "GET Listar Clientes",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response es un array\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.be.an('array');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cliente tiene campos obligatorios\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    const cliente = json[0];\r",
+                  "    pm.expect(cliente).to.have.property('id');\r",
+                  "    pm.expect(cliente).to.have.property('name');\r",
+                  "    pm.expect(cliente).to.have.property('email');\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Crear Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", function() {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Cliente creado tiene id\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.id).to.be.a('string');\r",
+                  "    pm.environment.set(\"clienteId\", json.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Nombre correcto\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.name).to.equal(\"Cliente Test Postman\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Cliente Test Postman\",\r\n    \"email\": \"test.postman@gmail.com\",\r\n    \"waPhone\": \"+56912345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/clients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Obtener Cliente por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Id correcto\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.id).to.equal(pm.environment.get(\"clienteId\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Es un objeto y no un array\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.be.an('object');\r",
+                  "    pm.expect(json).to.not.be.an('array');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{clienteId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients",
+                "{{clienteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Actualizar Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Nombre actualizado correctamente\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.name).to.equal(\"Cliente Test Postman Actualizado\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Id no cambió\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.id).to.equal(pm.environment.get(\"clienteId\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"updatedAt es distinto a createdAt\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.updatedAt).to.not.equal(json.createdAt);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Cliente Test Postman Actualizado\",\r\n    \"email\": \"test.postman@gmail.com\",\r\n    \"waPhone\": \"+56912345678\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{clienteId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients",
+                "{{clienteId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Eliminar Cliente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 cliente eliminado\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response confirma eliminacion\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.message).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{clienteId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients",
+                "{{clienteId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Clientes — Casos Negativos",
+      "item": [
+        {
+          "name": "POST Sin Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 401 sin token\", function() {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contiene mensaje de error\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.error).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Cliente Sin Token\",\r\n    \"email\": \"sintoken@gmail.com\",\r\n    \"waPhone\": \"+56911111111\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/clients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Token Invalido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 401 token inválido\", function() {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contiene mensaje de error\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.error).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer token_invalido_12345",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Cliente Token Invalido\",\r\n    \"email\": \"tokeninvalido@gmail.com\",\r\n    \"waPhone\": \"+56922222222\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/clients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Campos Vacios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400 campos vacíos\", function() {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contiene mensaje de error\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.error).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"\",\r\n    \"email\": \"\",\r\n    \"waPhone\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/clients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Cliente Inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404 cliente inexistente\", function() {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contiene mensaje de error\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.error).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients",
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Cliente Eliminado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404 cliente eliminado\", function() {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contiene mensaje de error\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.error).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients/{{clienteId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients",
+                "{{clienteId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Autenticación",
+      "item": [
+        {
+          "name": "POST Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Token presente\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.token).to.be.a('string');\r",
+                  "    pm.environment.set(\"token\", json.token);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"101010\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              "const token = pm.environment.get(\"token\");\r",
+              "\r",
+              "if (!token) {\r",
+              "    console.log(\"Sin token — se requiere ejecutar login primero\");\r",
+              "}"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {},
+            "exec": [
+              ""
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tareas",
+      "item": [
+        {
+          "name": "GET Listar Tareas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response es un array\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.be.an('array');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Crear Tarea",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 201\", function() {\r",
+                  "    pm.response.to.have.status(201);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Tarea creada tiene id\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.id).to.be.a('string');\r",
+                  "    pm.environment.set(\"tareaId\", json.id);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status inicial es pending\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.status).to.equal(\"pending\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"ClientId correcto\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.clientId).to.equal(pm.environment.get(\"clienteId\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"clientId\": \"{{clienteId}}\",\r\n    \"type\": \"recordatorio\",\r\n    \"due\": \"2026-06-01T10:00:00.000Z\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Eliminar Tarea",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200 tarea eliminada\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response confirma eliminacion\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.message).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tasks/{{tareaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks",
+                "{{tareaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Obtener Tarea por ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Id correcto\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.id).to.equal(pm.environment.get(\"tareaId\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Es un objeto y no un array\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.be.an('object');\r",
+                  "    pm.expect(json).to.not.be.an('array');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tasks/{{tareaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks",
+                "{{tareaId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PUT Actualizar Tarea",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Id no cambio\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.id).to.equal(pm.environment.get(\"tareaId\"));\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Due actualizado correctamente\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.due).to.include(\"2026-07-01\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status sigue siendo pending\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.status).to.equal(\"pending\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"due\": \"2026-07-01T10:00:00.000Z\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tasks/{{tareaId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks",
+                "{{tareaId}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Mensajes",
+      "item": []
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status ok\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.status).to.equal(\"ok\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Version presente\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.version).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Timestamp presente\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.timestamp).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tareas — Casos Negativos",
+      "item": [
+        {
+          "name": "POST Sin Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 401 sin token\", function() {\r",
+                  "    pm.response.to.have.status(401);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contiene mensaje de error\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.error).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"clientId\": \"{{clienteId}}\",\r\n    \"type\": \"recordatorio\",\r\n    \"due\": \"2026-06-01T10:00:00.000Z\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "POST Campos Vacios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 400 campos vacios\", function() {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contiene mensaje de error\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.error).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"clientId\": \"\",\r\n    \"type\": \"\",\r\n    \"due\": \"\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Tarea Inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 404 tarea inexistente\", function() {\r",
+                  "    pm.response.to.have.status(404);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response contiene mensaje de error\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.error).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tasks/00000000-0000-0000-0000-000000000000",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks",
+                "00000000-0000-0000-0000-000000000000"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
