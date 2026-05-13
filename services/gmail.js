@@ -2,41 +2,42 @@ const nodemailer = require('nodemailer');
 
 let transporter = null;
 
+function buildTransporter() {
+  return nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_APP_PASSWORD,
+    },
+  });
+}
+
 function getTransporter() {
   if (!transporter) {
-    transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: process.env.GMAIL_USER,
-        pass: process.env.GMAIL_APP_PASSWORD,
-      },
-    });
+    transporter = buildTransporter();
   }
   return transporter;
 }
 
-/**
- * Envía un email por Gmail.
- * @param {string} to       - Email destinatario
- * @param {string} subject  - Asunto
- * @param {string} body     - Cuerpo en texto plano
- * @param {string} [html]   - Cuerpo en HTML (opcional)
- */
-async function sendEmail({ to, subject, body, html }) {
-  const from = `"${process.env.GMAIL_FROM_NAME || 'RemindFlow'}" <${process.env.GMAIL_USER}>`;
-
-  const info = await getTransporter().sendMail({
-    from,
-    to,
-    subject,
-    text: body,
-    html: html || buildHtmlEmail(subject, body),
-  });
-
-  return { messageId: info.messageId, accepted: info.accepted };
+function resetTransporter() {
+  transporter = null;
 }
 
-/** Genera un HTML bonito y simple para el email */
+async function sendEmail({ to, subject, body, html }) {
+  const from = `"${process.env.GMAIL_FROM_NAME || 'RemindFlow'}" <${process.env.GMAIL_USER}>`;
+  try {
+    const info = await getTransporter().sendMail({
+      from, to, subject,
+      text: body,
+      html: html || buildHtmlEmail(subject, body),
+    });
+    return { messageId: info.messageId, accepted: info.accepted };
+  } catch (err) {
+    resetTransporter(); // limpia el transporter roto para el próximo intento
+    throw err;          // re-lanza el error para que la ruta devuelva 500
+  }
+}
+
 function buildHtmlEmail(subject, body) {
   const lines = body.replace(/\n/g, '<br>');
   return `
@@ -66,9 +67,11 @@ function buildHtmlEmail(subject, body) {
 
 async function verifyConnection() {
   try {
-    await getTransporter().verify();
+    const testTransporter = buildTransporter(); // transporter temporal — no toca el singleton
+    await testTransporter.verify();
     return true;
   } catch (e) {
+    resetTransporter(); // si falla la verificación, limpia el singleton también
     return false;
   }
 }
