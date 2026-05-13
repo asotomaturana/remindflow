@@ -1,24 +1,22 @@
 /**
- * RemindFlow — Middleware de autenticación v3.4.0
+ * RemindFlow — Middleware de autenticación v3.5.0
  *
- * Acepta dos métodos:
- *  1. Header X-API-Key: <clave>          — acceso programático / scripts
- *  2. Header Authorization: Bearer <jwt> — frontend con login
+ * CAMBIOS v3.5.0 (fix H-03):
+ *   - Diferencia mensaje de error entre token inválido y token expirado
  */
 
 const { verifyToken } = require('../routes/auth');
 
 function requireAuth(req, res, next) {
-  // Método 1: API Key (compatible con versiones anteriores)
   const apiKey = req.headers['x-api-key'];
   if (apiKey && apiKey === process.env.API_SECRET_KEY) {
     req.authMethod = 'apikey';
     return next();
   }
 
-  // Método 2: JWT Bearer token
   const auth  = req.headers['authorization'] || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
+
   if (token) {
     const payload = verifyToken(token);
     if (payload) {
@@ -26,7 +24,19 @@ function requireAuth(req, res, next) {
       req.user = payload;
       return next();
     }
-    return res.status(401).json({ error: 'Token expirado. Inicia sesión nuevamente.' });
+
+    try {
+      const [header, body, sig] = token.split('.');
+      if (header && body && sig) {
+        const decoded   = JSON.parse(Buffer.from(body, 'base64url').toString());
+        const isExpired = decoded.exp && Math.floor(Date.now() / 1000) > decoded.exp;
+        if (isExpired) {
+          return res.status(401).json({ error: 'Token expirado. Inicia sesión nuevamente.' });
+        }
+      }
+    } catch {}
+
+    return res.status(401).json({ error: 'Token inválido.' });
   }
 
   return res.status(401).json({ error: 'No autorizado. Inicia sesión o incluye X-API-Key.' });
