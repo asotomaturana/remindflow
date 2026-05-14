@@ -799,6 +799,41 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "PATCH Actualizar Status Tarea",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"status\": \"sent\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tasks/{{tareaId}}/status",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks",
+                "{{tareaId}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
@@ -1187,6 +1222,508 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Fixes & Verification",
+      "item": [
+        {
+          "name": "🔐 Auth",
+          "item": [
+            {
+              "name": "Login — obtener token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const response = pm.response.json();\r",
+                      "pm.environment.set(\"token\", response.token);\r",
+                      "\r",
+                      "pm.test(\"Status 200\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(200);\r",
+                      "});\r",
+                      "pm.test(\"Token existe\", () => {\r",
+                      "    pm.expect(response.token).to.exist;\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"{{app_password}}\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "✅ H-03 JWT",
+          "item": [
+            {
+              "name": "H-03 — Token tiene iat y exp correctos",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "const response = pm.response.json();\r",
+                      "const token = response.token;\r",
+                      "const payload = JSON.parse(atob(token.split('.')[1]));\r",
+                      "\r",
+                      "pm.test(\"iat en segundos — 10 dígitos\", () => {\r",
+                      "    pm.expect(payload.iat.toString().length).to.equal(10);\r",
+                      "});\r",
+                      "pm.test(\"campo exp existe\", () => {\r",
+                      "    pm.expect(payload).to.have.property('exp');\r",
+                      "});\r",
+                      "pm.test(\"exp = iat + 8 horas\", () => {\r",
+                      "    pm.expect(payload.exp).to.equal(payload.iat + 28800);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"{{app_password}}\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "H-03 — Token invalido → 401",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 401\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(401);\r",
+                      "});\r",
+                      "pm.test(\"Mensaje correcto\", () => {\r",
+                      "    pm.expect(pm.response.json().error).to.equal(\"Token inválido.\");\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer tokenbasura123",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/clients",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "clients"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "H-03 — Token valido → /auth/me",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(200);\r",
+                      "});\r",
+                      "pm.test(\"Username correcto\", () => {\r",
+                      "    pm.expect(pm.response.json().username).to.equal(\"admin\");\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/me",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "📧 H-01 Gmail",
+          "item": [
+            {
+              "name": "H-01 — Test envio Gmail",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(200);\r",
+                      "});\r",
+                      "pm.test(\"success true\", () => {\r",
+                      "    pm.expect(pm.response.json().success).to.be.true;\r",
+                      "});\r",
+                      "pm.test(\"messageId existe\", () => {\r",
+                      "    pm.expect(pm.response.json().messageId).to.exist;\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"to\": \"alejandrosotomaturana@gmail.com\",\r\n    \"subject\": \"Test H-01 — verificación fix Gmail\",\r\n    \"body\": \"Si recibes este email, H-01 está resuelto.\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/messages/gmail",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "messages",
+                    "gmail"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "H-01 — Verificar registro en auditoria",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(200);\r",
+                      "});\r",
+                      "pm.test(\"Al menos un registro de mensaje enviado\", () => {\r",
+                      "    pm.expect(pm.response.json().length).to.be.above(0);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/audit?entity=message&action=sent&limit=5",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "audit"
+                  ],
+                  "query": [
+                    {
+                      "key": "entity",
+                      "value": "message"
+                    },
+                    {
+                      "key": "action",
+                      "value": "sent"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "5"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "💬 H-02 WhatsApp",
+          "item": [
+            {
+              "name": "H-02 — Test envio WhatsApp",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(200);\r",
+                      "});\r",
+                      "pm.test(\"success true\", () => {\r",
+                      "    pm.expect(pm.response.json().success).to.be.true;\r",
+                      "});\r",
+                      "pm.test(\"sid existe\", () => {\r",
+                      "    pm.expect(pm.response.json().sid).to.exist;\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"to\": \"+56XXXXXXXXX\",\r\n    \"body\": \"Test H-02 — validación sandbox RemindFlow\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/messages/whatsapp",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "messages",
+                    "whatsapp"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "🔍 Diagnóstico",
+          "item": [
+            {
+              "name": "Diagnostico — Health check",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(200);\r",
+                      "});\r",
+                      "pm.test(\"Version 4.3.0\", () => {\r",
+                      "    pm.expect(pm.response.json().version).to.equal(\"4.3.0\");\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Diagnostico — Status Gmail y Twilio",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(200);\r",
+                      "});\r",
+                      "pm.test(\"Gmail conectado\", () => {\r",
+                      "    pm.expect(pm.response.json().gmail).to.equal(\"conectado\");\r",
+                      "});\r",
+                      "pm.test(\"Twilio conectado\", () => {\r",
+                      "    pm.expect(pm.response.json().twilio).to.equal(\"conectado\");\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/status",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "New Request",
+      "request": {
+        "method": "GET",
+        "header": []
+      },
+      "response": []
     }
   ]
 }
