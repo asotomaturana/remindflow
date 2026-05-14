@@ -347,6 +347,9 @@ const updateScheduledMessage = (id, data) => {
   const sets = []; const vals = [];
   if (data.status  !== undefined) { sets.push('status = ?');   vals.push(data.status); }
   if (data.sentAt  !== undefined) { sets.push('sent_at = ?');  vals.push(data.sentAt); }
+  if (data.lastError   !== undefined) { sets.push('last_error = ?');    vals.push(data.lastError); }
+  if (data.retryCount  !== undefined) { sets.push('retry_count = ?');   vals.push(data.retryCount); }
+  if (data.nextRetryAt !== undefined) { sets.push('next_retry_at = ?'); vals.push(data.nextRetryAt); }
   if (!sets.length) return mapScheduled(getDb().prepare('SELECT * FROM scheduled WHERE id = ?').get(id));
   vals.push(id);
   getDb().prepare(`UPDATE scheduled SET ${sets.join(', ')} WHERE id = ?`).run(...vals);
@@ -824,7 +827,9 @@ function runMigrations() {
       );
       CREATE INDEX IF NOT EXISTS idx_scheduled_status ON scheduled(status, scheduled_at);
     `);
-
+    try { db.exec(`ALTER TABLE scheduled ADD COLUMN last_error TEXT`); } catch {}
+    try { db.exec(`ALTER TABLE scheduled ADD COLUMN retry_count INTEGER NOT NULL DEFAULT 0`); } catch {}
+    try { db.exec(`ALTER TABLE scheduled ADD COLUMN next_retry_at TEXT`); } catch {}
     // ── acuerdos ─────────────────────────────────────────────
     db.exec(`
       CREATE TABLE IF NOT EXISTS acuerdos (
