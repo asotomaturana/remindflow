@@ -1,43 +1,24 @@
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 
-let transporter = null;
-
-function buildTransporter() {
-  return nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_APP_PASSWORD,
-    },
-  });
-}
-
-function getTransporter() {
-  if (!transporter) {
-    transporter = buildTransporter();
-  }
-  return transporter;
-}
-
-function resetTransporter() {
-  transporter = null;
-}
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function sendEmail({ to, subject, body, html }) {
-  const from = `"${process.env.GMAIL_FROM_NAME || 'RemindFlow'}" <${process.env.GMAIL_USER}>`;
-  try {
-    const info = await getTransporter().sendMail({
-      from, to, subject,
-      text: body,
-      html: html || buildHtmlEmail(subject, body),
-    });
-    return { messageId: info.messageId, accepted: info.accepted };
-  } catch (err) {
-    resetTransporter(); // limpia el transporter roto para el próximo intento
-    throw err;          // re-lanza el error para que la ruta devuelva 500
-  }
+  const msg = {
+    to,
+    from: {
+      email: process.env.GMAIL_USER,
+      name:  process.env.GMAIL_FROM_NAME || 'RemindFlow',
+    },
+    subject,
+    text: body,
+    html: html || buildHtmlEmail(subject, body),
+  };
+
+  const [response] = await sgMail.send(msg);
+  return {
+    messageId: response.headers['x-message-id'] || 'sendgrid',
+    accepted:  [to],
+  };
 }
 
 function buildHtmlEmail(subject, body) {
@@ -69,11 +50,13 @@ function buildHtmlEmail(subject, body) {
 
 async function verifyConnection() {
   try {
-    const testTransporter = buildTransporter(); // transporter temporal — no toca el singleton
-    await testTransporter.verify();
+    // SendGrid no tiene un método verify() como Nodemailer
+    // Verificamos que la API Key esté configurada
+    if (!process.env.SENDGRID_API_KEY) {
+      throw new Error('SENDGRID_API_KEY no configurada');
+    }
     return true;
   } catch (e) {
-    resetTransporter(); // si falla la verificación, limpia el singleton también
     return false;
   }
 }
