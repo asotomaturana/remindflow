@@ -40,7 +40,20 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // helmet activa protecciones HTTP por defecto.
 // CSP deshabilitado porque el frontend usa inline JS (onclick, scripts en index.html).
 // TODO (v-future): migrar onclick a event listeners y reactivar CSP — ver todo.md
-app.use(helmet({ contentSecurityPolicy: false }));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc:     ["'self'"],
+      scriptSrc:      ["'self'", "'unsafe-inline'"],
+      styleSrc:       ["'self'", "'unsafe-inline'"],
+      imgSrc:         ["'self'", "data:", "https:"],
+      connectSrc:     ["'self'"],
+      fontSrc:        ["'self'", "https:", "data:"],
+      objectSrc:      ["'none'"],
+      frameAncestors: ["'none'"],
+    },
+  },
+}));
 app.use(cors());
 app.use(express.json());
 app.use(rateLimit({ windowMs: 60*1000, max: 120, message: { error: 'Demasiadas peticiones.' } }));
