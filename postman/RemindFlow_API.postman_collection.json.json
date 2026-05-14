@@ -1712,6 +1712,242 @@
                 }
               },
               "response": []
+            },
+            {
+              "name": "H-05 Verificar CSP activo",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"CSP header presente\", () => {\r",
+                      "    const csp = pm.response.headers.get('Content-Security-Policy');\r",
+                      "    pm.expect(csp).to.exist;\r",
+                      "});\r",
+                      "pm.test(\"CSP incluye frame-ancestors none\", () => {\r",
+                      "    const csp = pm.response.headers.get('Content-Security-Policy');\r",
+                      "    pm.expect(csp).to.include(\"frame-ancestors 'none'\");\r",
+                      "});\r",
+                      "pm.test(\"CSP incluye object-src none\", () => {\r",
+                      "    const csp = pm.response.headers.get('Content-Security-Policy');\r",
+                      "    pm.expect(csp).to.include(\"object-src 'none'\");\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "H-04 — Webhook Twilio",
+          "item": [
+            {
+              "name": "H-04 Inyeccion sin firma → 403",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Petición sin firma rechazada — 403\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(403);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "key": "From",
+                      "value": "whatsapp:+56912345678",
+                      "type": "text",
+                      "uuid": "03b375d2-b64d-4185-bb48-76764520adc8"
+                    },
+                    {
+                      "key": "Body",
+                      "value": "Mensaje falso inyectado",
+                      "type": "text",
+                      "uuid": "0b2a67c5-e6da-4b52-8d44-f1ba7fcbfcdc"
+                    },
+                    {
+                      "key": "MessageSid",
+                      "value": "SM_FAKE_123",
+                      "type": "text",
+                      "uuid": "06e522cb-d2c6-4524-92f9-b6d37a00e89f"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/webhooks/twilio/webhook-twilio",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "webhooks",
+                    "twilio",
+                    "webhook-twilio"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "H-05 — CSP",
+          "item": [
+            {
+              "name": "H-05 Verificar CSP activo",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"CSP header presente\", () => {\r",
+                      "    const csp = pm.response.headers.get('Content-Security-Policy');\r",
+                      "    pm.expect(csp).to.exist;\r",
+                      "});\r",
+                      "pm.test(\"CSP incluye frame-ancestors none\", () => {\r",
+                      "    const csp = pm.response.headers.get('Content-Security-Policy');\r",
+                      "    pm.expect(csp).to.include(\"frame-ancestors 'none'\");\r",
+                      "});\r",
+                      "pm.test(\"CSP incluye object-src none\", () => {\r",
+                      "    const csp = pm.response.headers.get('Content-Security-Policy');\r",
+                      "    pm.expect(csp).to.include(\"object-src 'none'\");\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "H-06 — Credenciales",
+          "item": [
+            {
+              "name": "H-06 Crear acceso sin contrasena",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 201\", () => {\r",
+                      "    pm.expect(pm.response.code).to.equal(201);\r",
+                      "});\r",
+                      "pm.test(\"Sin campo password en response\", () => {\r",
+                      "    pm.expect(pm.response.json()).to.not.have.property('password');\r",
+                      "});\r",
+                      "pm.test(\"accessType presente\", () => {\r",
+                      "    pm.expect(pm.response.json().accessType).to.equal('colaborador');\r",
+                      "});\r",
+                      "// Guardar ID para el siguiente test\r",
+                      "pm.environment.set(\"credencial_id\", pm.response.json().id);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"clientId\": \"500538de-181d-4027-b419-d71349006d34\",\r\n    \"platform\": \"instagram\",\r\n    \"accessType\": \"colaborador\",\r\n    \"username\": \"@test_usuario\",\r\n    \"notes\": \"Test H-06 verificación\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/credenciales",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "credenciales"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "H-06 Endpoint reveal eliminado → 404",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/credenciales/{{credencial_id}}/reveal",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "credenciales",
+                    "{{credencial_id}}",
+                    "reveal"
+                  ]
+                }
+              },
+              "response": []
             }
           ]
         }
