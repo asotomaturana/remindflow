@@ -69,6 +69,9 @@ function mapScheduled(row) {
     contentType: row.content_type, contentName: row.content_name,
     platform: row.platform, contenidoId: row.contenido_id,
     status: row.status, sentAt: row.sent_at, createdAt: row.created_at,
+    retryCount:  row.retry_count  || 0,
+    lastError:   row.last_error   || null,
+    nextRetryAt: row.next_retry_at || null,
   };
 }
 
