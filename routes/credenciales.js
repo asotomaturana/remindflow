@@ -11,7 +11,7 @@
 const express = require('express');
 const router  = express.Router();
 const { randomUUID } = require('crypto');
-const { addAudit } = require('./store');
+const { addAudit } = require('../store');
 
 // Almacén en memoria — pendiente migrar a SQLite (deuda técnica)
 let accesos = [];
