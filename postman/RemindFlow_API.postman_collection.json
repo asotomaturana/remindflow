@@ -8,7 +8,7 @@
   },
   "item": [
     {
-      "name": "Autenticación",
+      "name": "Authentication",
       "item": [
         {
           "name": "POST Login",
@@ -89,10 +89,10 @@
       ]
     },
     {
-      "name": "Clientes",
+      "name": "Clients",
       "item": [
         {
-          "name": "GET Listar Clientes",
+          "name": "GET List Clients",
           "event": [
             {
               "listen": "test",
@@ -148,7 +148,7 @@
           "response": []
         },
         {
-          "name": "POST Crear Cliente",
+          "name": "POST Create Client",
           "event": [
             {
               "listen": "test",
@@ -211,7 +211,7 @@
           "response": []
         },
         {
-          "name": "GET Obtener Cliente por ID",
+          "name": "GET Get Client by ID",
           "event": [
             {
               "listen": "test",
@@ -266,7 +266,7 @@
           "response": []
         },
         {
-          "name": "PUT Actualizar Cliente",
+          "name": "PUT Update Client",
           "event": [
             {
               "listen": "test",
@@ -336,10 +336,10 @@
       ]
     },
     {
-      "name": "Clientes — Casos Negativos",
+      "name": "Clients — Negative Cases",
       "item": [
         {
-          "name": "POST Sin Token",
+          "name": "POST No Token",
           "event": [
             {
               "listen": "test",
@@ -390,7 +390,7 @@
           "response": []
         },
         {
-          "name": "POST Token Invalido",
+          "name": "POST Invalid Token",
           "event": [
             {
               "listen": "test",
@@ -450,7 +450,7 @@
           "response": []
         },
         {
-          "name": "POST Campos Vacios",
+          "name": "POST Empty Fields",
           "event": [
             {
               "listen": "test",
@@ -507,7 +507,7 @@
           "response": []
         },
         {
-          "name": "GET Cliente Inexistente",
+          "name": "GET Non-existent Client",
           "event": [
             {
               "listen": "test",
@@ -558,10 +558,10 @@
       ]
     },
     {
-      "name": "Tareas",
+      "name": "Tasks",
       "item": [
         {
-          "name": "GET Listar Tareas",
+          "name": "GET List Tasks",
           "event": [
             {
               "listen": "test",
@@ -609,7 +609,7 @@
           "response": []
         },
         {
-          "name": "POST Crear Tarea",
+          "name": "POST Create Task",
           "event": [
             {
               "listen": "test",
@@ -677,7 +677,7 @@
           "response": []
         },
         {
-          "name": "GET Obtener Tarea por ID",
+          "name": "GET Get Task by ID",
           "event": [
             {
               "listen": "test",
@@ -733,7 +733,7 @@
           "response": []
         },
         {
-          "name": "PUT Actualizar Tarea",
+          "name": "PUT Update Task",
           "event": [
             {
               "listen": "test",
@@ -801,7 +801,7 @@
           "response": []
         },
         {
-          "name": "PATCH Actualizar Status Tarea",
+          "name": "DELETE Delete Task",
           "request": {
             "method": "PATCH",
             "header": [
@@ -838,70 +838,10 @@
       ]
     },
     {
-      "name": "Mensajes",
-      "item": []
-    },
-    {
-      "name": "Health",
+      "name": "Tasks — Negative Cases",
       "item": [
         {
-          "name": "GET Health Check",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Status 200\", function() {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"Status ok\", function() {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json.status).to.equal(\"ok\");\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"Version presente\", function() {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json.version).to.be.a('string');\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"Timestamp presente\", function() {\r",
-                  "    const json = pm.response.json();\r",
-                  "    pm.expect(json.timestamp).to.be.a('string');\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
-                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {},
-                "requests": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/health",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "health"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "Tareas — Casos Negativos",
-      "item": [
-        {
-          "name": "POST Sin Token",
+          "name": "POST No Token",
           "event": [
             {
               "listen": "test",
@@ -952,7 +892,7 @@
           "response": []
         },
         {
-          "name": "POST Campos Vacios",
+          "name": "POST Empty Fields",
           "event": [
             {
               "listen": "test",
@@ -1009,7 +949,7 @@
           "response": []
         },
         {
-          "name": "GET Tarea Inexistente",
+          "name": "GET Non-existent Task",
           "event": [
             {
               "listen": "test",
@@ -1072,10 +1012,70 @@
       ]
     },
     {
-      "name": "Limpieza",
+      "name": "Messages",
+      "item": []
+    },
+    {
+      "name": "Health",
       "item": [
         {
-          "name": "DELETE Eliminar Tarea",
+          "name": "GET Health Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status 200\", function() {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Status ok\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.status).to.equal(\"ok\");\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Version presente\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.version).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Timestamp presente\", function() {\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.timestamp).to.be.a('string');\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/health",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Cleanup",
+      "item": [
+        {
+          "name": "DELETE Delete Task",
           "event": [
             {
               "listen": "test",
@@ -1124,7 +1124,7 @@
           "response": []
         },
         {
-          "name": "DELETE Eliminar Cliente",
+          "name": "DELETE Delete Client",
           "event": [
             {
               "listen": "test",
@@ -1173,7 +1173,7 @@
           "response": []
         },
         {
-          "name": "GET Cliente Eliminado",
+          "name": "GET Deleted Client",
           "event": [
             {
               "listen": "test",
@@ -1220,17 +1220,67 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "DELETE Delete Credential",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/credenciales/{{credencialId}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "credenciales",
+                "{{credencialId}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE Delete Credential 2",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/credenciales/{{credencialId2}}",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "credenciales",
+                "{{credencialId2}}"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     },
     {
-      "name": "Fixes & Verification",
+      "name": "DEV Fixes & Verification",
       "item": [
         {
           "name": "🔐 Auth",
           "item": [
             {
-              "name": "Login — obtener token",
+              "name": "POST Login — Get Token",
               "event": [
                 {
                   "listen": "test",
@@ -1289,7 +1339,7 @@
           "name": "✅ H-03 JWT",
           "item": [
             {
-              "name": "H-03 — Token tiene iat y exp correctos",
+              "name": "POST H-03 — Token Has Correct iat and exp",
               "event": [
                 {
                   "listen": "test",
@@ -1350,7 +1400,7 @@
               "response": []
             },
             {
-              "name": "H-03 — Token invalido → 401",
+              "name": "GET H-03 — Invalid Token Returns 401",
               "event": [
                 {
                   "listen": "test",
@@ -1392,7 +1442,7 @@
               "response": []
             },
             {
-              "name": "H-03 — Token valido → /auth/me",
+              "name": "GET H-03 — Valid Token Returns auth/me",
               "event": [
                 {
                   "listen": "test",
@@ -1439,7 +1489,7 @@
           "name": "📧 H-01 Gmail",
           "item": [
             {
-              "name": "H-01 — Test envio Gmail",
+              "name": "POST H-01 — Test Gmail Sending",
               "event": [
                 {
                   "listen": "test",
@@ -1502,7 +1552,7 @@
               "response": []
             },
             {
-              "name": "H-01 — Verificar registro en auditoria",
+              "name": "GET H-01 — Verify Audit Record",
               "event": [
                 {
                   "listen": "test",
@@ -1563,7 +1613,7 @@
           "name": "💬 H-02 WhatsApp",
           "item": [
             {
-              "name": "H-02 — Test envio WhatsApp",
+              "name": "POST H-02 — Test WhatsApp Sending",
               "event": [
                 {
                   "listen": "test",
@@ -1628,10 +1678,10 @@
           ]
         },
         {
-          "name": "🔍 Diagnóstico",
+          "name": "Diagnostics",
           "item": [
             {
-              "name": "Diagnostico — Health check",
+              "name": "GET Diagnostics — Health Check",
               "event": [
                 {
                   "listen": "test",
@@ -1666,7 +1716,7 @@
               "response": []
             },
             {
-              "name": "Diagnostico — Status Gmail y Twilio",
+              "name": "GET Diagnostics — Gmail and Twilio Status",
               "event": [
                 {
                   "listen": "test",
@@ -1714,7 +1764,7 @@
               "response": []
             },
             {
-              "name": "H-05 Verificar CSP activo",
+              "name": "GET H-05 — Verify CSP Active",
               "event": [
                 {
                   "listen": "test",
@@ -1757,10 +1807,10 @@
           ]
         },
         {
-          "name": "H-04 — Webhook Twilio",
+          "name": "H-04 — Twilio Webhook",
           "item": [
             {
-              "name": "H-04 Inyeccion sin firma → 403",
+              "name": "POST H-04 — Injection Without Signature Returns 403",
               "event": [
                 {
                   "listen": "test",
@@ -1776,8 +1826,11 @@
                   }
                 }
               ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
               "request": {
-                "method": "POST",
+                "method": "GET",
                 "header": [],
                 "body": {
                   "mode": "urlencoded",
@@ -1822,7 +1875,7 @@
           "name": "H-05 — CSP",
           "item": [
             {
-              "name": "H-05 Verificar CSP activo",
+              "name": "GET H-05 — Verify CSP Active",
               "event": [
                 {
                   "listen": "test",
@@ -1865,10 +1918,10 @@
           ]
         },
         {
-          "name": "H-06 — Credenciales",
+          "name": "H-06 — Credentials",
           "item": [
             {
-              "name": "H-06 Crear acceso sin contrasena",
+              "name": "POST H-06 — Create Access Without Password",
               "event": [
                 {
                   "listen": "test",
@@ -1954,12 +2007,1444 @@
       ]
     },
     {
-      "name": "New Request",
-      "request": {
-        "method": "GET",
-        "header": []
-      },
-      "response": []
+      "name": "QA Verification",
+      "item": [
+        {
+          "name": "H-03 JWT",
+          "item": [
+            {
+              "name": "POST H03-TC01 Login iat in Seconds",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"iat tiene 10 digitos - esta en segundos\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    const token = json.token;\r",
+                      "    const payload = JSON.parse(atob(token.split('.')[1]));\r",
+                      "    pm.expect(payload.iat.toString()).to.have.lengthOf(10);\r",
+                      "    pm.environment.set(\"token\", json.token);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"101010\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST H03-TC02 Login exp Correct",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"exp igual a iat mas 28800\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    const token = json.token;\r",
+                      "    const payload = JSON.parse(atob(token.split('.')[1]));\r",
+                      "    pm.expect(payload.exp).to.equal(payload.iat + 28800);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"exp tiene 10 digitos - esta en segundos\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    const token = json.token;\r",
+                      "    const payload = JSON.parse(atob(token.split('.')[1]));\r",
+                      "    pm.expect(payload.exp.toString()).to.have.lengthOf(10);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"username\": \"admin\",\r\n    \"password\": \"101010\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/auth/login",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET H03-TC03 Invalid Token Returns 401",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 401\", function() {\r",
+                      "    pm.response.to.have.status(401);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Mensaje correcto - Token invalido\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.error).to.equal(\"Token inválido.\");\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer tokenbasura123",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/clients",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "clients"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET H03-TC04 GET auth/me Returns User Data",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response contiene username\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.username).to.be.a('string');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response contiene role\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.role).to.be.a('string');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/auth/me",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "me"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "H-01 Gmail",
+          "item": [
+            {
+              "name": "POST H01-TC01 Gmail Sends Message Correctly",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response contiene success true\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.success).to.equal(true);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response contiene messageId\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.messageId).to.be.a('string');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 5000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(5000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"to\": \"alejandrosotomaturana@gmail.com\",\r\n    \"subject\": \"Test H-01 QA Verification\",\r\n    \"body\": \"Verificacion fix Gmail — RemindFlow v4.3.1\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/messages/gmail",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "messages",
+                    "gmail"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET H01-TC03 Audit Record After Sending",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response es un array\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.be.an('array');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Array contiene al menos un registro\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.length).to.be.above(0);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/audit?entity=message&action=sent",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "audit"
+                  ],
+                  "query": [
+                    {
+                      "key": "entity",
+                      "value": "message"
+                    },
+                    {
+                      "key": "action",
+                      "value": "sent"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST H01-TC04 No Subject Returns 400",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 400\", function() {\r",
+                      "    pm.response.to.have.status(400);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Mensaje de error correcto\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.error).to.equal(\"Se requieren subject y body\");\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"to\": \"alejandrosotomaturana@gmail.com\",\r\n    \"body\": \"Mensaje sin subject\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/messages/gmail",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "messages",
+                    "gmail"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST H01-TC05 No clientId or to Returns 400",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 400\", function() {\r",
+                      "    pm.response.to.have.status(400);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Mensaje de error correcto\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.error).to.equal(\"Se requiere clientId o to\");\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"subject\": \"Test sin destinatario\",\r\n    \"body\": \"Mensaje sin clientId ni to\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/messages/gmail",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "messages",
+                    "gmail"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "H-04 Webhook",
+          "item": [
+            {
+              "name": "POST H04-TC01 No Twilio Signature Returns 403",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 403 sin firma Twilio\", function() {\r",
+                      "    pm.response.to.have.status(403);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "From",
+                      "value": "whatsapp:+56912345678",
+                      "type": "text",
+                      "uuid": "add804f5-0eea-4f6c-a63f-72b4e665e193"
+                    },
+                    {
+                      "key": "Body",
+                      "value": "Mensaje falso inyectado",
+                      "type": "text",
+                      "uuid": "69b4883a-0465-49b1-8384-254aadb6f9a2"
+                    },
+                    {
+                      "key": "MessageSid",
+                      "value": "SM_FAKE_123",
+                      "type": "text",
+                      "uuid": "3ae63ecf-68b6-44b1-b67b-8589923af073"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/webhooks/twilio/webhook-twilio",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "webhooks",
+                    "twilio",
+                    "webhook-twilio"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST H04-TC02 Invalid Signature Returns 403",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 403 firma invalida\", function() {\r",
+                      "    pm.response.to.have.status(403);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "X-Twilio-Signature",
+                    "value": "firma_invalida_123",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "From",
+                      "value": "whatsapp:+56912345678",
+                      "type": "text",
+                      "uuid": "aad5c3c7-dc8c-44da-84ee-d3658840312e"
+                    },
+                    {
+                      "key": "Body",
+                      "value": "Mensaje falso inyectado",
+                      "type": "text",
+                      "uuid": "ff937998-9bbf-4c37-8769-f21bef0c015a"
+                    },
+                    {
+                      "key": "MessageSid",
+                      "value": "SM_FAKE_123",
+                      "type": "text",
+                      "uuid": "e85f3b25-95cf-4994-b064-29e8a053e360"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{base_url}}/webhooks/twilio/webhook-twilio",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "webhooks",
+                    "twilio",
+                    "webhook-twilio"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "H04-TC03 Verify webhook received message",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/audit",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "audit"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "H-05 CSP",
+          "item": [
+            {
+              "name": "GET H05-TC01 CSP Header Present",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Header Content-Security-Policy presente\", function() {\r",
+                      "    const csp = pm.response.headers.get(\"Content-Security-Policy\");\r",
+                      "    pm.expect(csp).to.not.be.null;\r",
+                      "    pm.expect(csp).to.be.a('string');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET H05-TC02 CSP Includes frame-ancestors none",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"CSP incluye frame-ancestors none\", function() {\r",
+                      "    const csp = pm.response.headers.get(\"Content-Security-Policy\");\r",
+                      "    pm.expect(csp).to.include(\"frame-ancestors 'none'\");\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET H05-TC03 CSP Includes object-src none",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"CSP incluye object-src none\", function() {\r",
+                      "    const csp = pm.response.headers.get(\"Content-Security-Policy\");\r",
+                      "    pm.expect(csp).to.include(\"object-src 'none'\");\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{base_url}}/health",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "health"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "H-06 Credenciales",
+          "item": [
+            {
+              "name": "POST H06-TC01 POST Credential Without Password Field",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 201\", function() {\r",
+                      "    pm.response.to.have.status(201);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response NO contiene campo password\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.not.have.property('password');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response NO contiene campo encryptedPassword\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.not.have.property('encryptedPassword');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"accessType correcto\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.accessType).to.equal('colaborador');\r",
+                      "    pm.environment.set(\"credencialId\", json.id);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"clientId\": \"500538de-181d-4027-b419-d71349006d34\",\r\n    \"platform\": \"instagram\",\r\n    \"accessType\": \"colaborador\",\r\n    \"username\": \"@test_qa_verification\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/credenciales",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "credenciales"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST H06-TC02 POST With Password Field Ignored",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 201\", function() {\r",
+                      "    pm.response.to.have.status(201);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response NO contiene campo password\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.not.have.property('password');\r",
+                      "    pm.environment.set(\"credencialId2\", json.id);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response NO contiene campo encryptedPassword\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.not.have.property('encryptedPassword');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"clientId\": \"500538de-181d-4027-b419-d71349006d34\",\r\n    \"platform\": \"facebook\",\r\n    \"accessType\": \"administrador\",\r\n    \"username\": \"@test_qa_tc02\",\r\n    \"password\": \"contrasena_secreta_123\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/credenciales",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "credenciales"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST H06-TC03 Reveal Endpoint Returns 404",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 404 endpoint reveal eliminado\", function() {\r",
+                      "    pm.response.to.have.status(404);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"adminPassword\": \"cualquier_cosa\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/credenciales/{{credencialId}}/reveal",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "credenciales",
+                    "{{credencialId}}",
+                    "reveal"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST H06-TC04 Invalid Platform Returns 400",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 400 platform invalida\", function() {\r",
+                      "    pm.response.to.have.status(400);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response contiene mensaje de error\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.error).to.be.a('string');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"clientId\": \"500538de-181d-4027-b419-d71349006d34\",\r\n    \"platform\": \"plataforma_invalida\",\r\n    \"accessType\": \"colaborador\",\r\n    \"username\": \"@test_qa_tc04\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/credenciales",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "credenciales"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "POST H06-TC05 No accessType Returns 400",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 400 sin accessType\", function() {\r",
+                      "    pm.response.to.have.status(400);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Mensaje de error correcto\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json.error).to.equal(\"clientId, platform y accessType son requeridos\");\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\r\n    \"clientId\": \"500538de-181d-4027-b419-d71349006d34\",\r\n    \"platform\": \"instagram\",\r\n    \"username\": \"@test_qa_tc05\"\r\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{base_url}}/api/credenciales",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "credenciales"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET H06-TC06 GET Credentials Without Password Fields",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response es un array\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.be.an('array');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Ningun elemento contiene campo password\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    json.forEach(function(credencial) {\r",
+                      "        pm.expect(credencial).to.not.have.property('password');\r",
+                      "    });\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Ningun elemento contiene campo encryptedPassword\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    json.forEach(function(credencial) {\r",
+                      "        pm.expect(credencial).to.not.have.property('encryptedPassword');\r",
+                      "    });\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/credenciales",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "credenciales"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "H-08 Scheduler",
+          "item": [
+            {
+              "name": "GET H08-TC01 Schedule Includes retryCount",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response es un array\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.be.an('array');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Cada mensaje incluye campo retryCount\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    json.forEach(function(mensaje) {\r",
+                      "        pm.expect(mensaje).to.have.property('retryCount');\r",
+                      "    });\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"retryCount es de tipo number\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    json.forEach(function(mensaje) {\r",
+                      "        pm.expect(mensaje.retryCount).to.be.a('number');\r",
+                      "    });\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/messages/schedule",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "messages",
+                    "schedule"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET H08-TC02 Schedule Includes lastError",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response es un array\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.be.an('array');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Cada mensaje incluye campo lastError\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    json.forEach(function(mensaje) {\r",
+                      "        pm.expect(mensaje).to.have.property('lastError');\r",
+                      "    });\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"lastError es string o null\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    json.forEach(function(mensaje) {\r",
+                      "        const isNull = mensaje.lastError === null;\r",
+                      "        const isString = typeof mensaje.lastError === 'string';\r",
+                      "        pm.expect(isNull || isString).to.be.true;\r",
+                      "    });\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/messages/schedule",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "messages",
+                    "schedule"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "GET H08-TC03 Schedule Includes nextRetryAt",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test(\"Status 200\", function() {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response es un array\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    pm.expect(json).to.be.an('array');\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Cada mensaje incluye campo nextRetryAt\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    json.forEach(function(mensaje) {\r",
+                      "        pm.expect(mensaje).to.have.property('nextRetryAt');\r",
+                      "    });\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"nextRetryAt es string o null\", function() {\r",
+                      "    const json = pm.response.json();\r",
+                      "    json.forEach(function(mensaje) {\r",
+                      "        const isNull = mensaje.nextRetryAt === null;\r",
+                      "        const isString = typeof mensaje.nextRetryAt === 'string';\r",
+                      "        pm.expect(isNull || isString).to.be.true;\r",
+                      "    });\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"Response time menor a 2000ms\", function() {\r",
+                      "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+                      "});"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{token}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{base_url}}/api/messages/schedule",
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "messages",
+                    "schedule"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Utility Requests",
+      "item": [
+        {
+          "name": "GET All Clients",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/clients",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "clients"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET All Tasks",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/tasks",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET All Credenciales",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/credenciales",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "credenciales"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Audit Log",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/audit",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "audit"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET Scheduled Messages",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/messages/schedule",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "messages",
+                "schedule"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
