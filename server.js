@@ -45,10 +45,11 @@ app.use(helmet({
     directives: {
       defaultSrc:     ["'self'"],
       scriptSrc:      ["'self'", "'unsafe-inline'"],
-      styleSrc:       ["'self'", "'unsafe-inline'"],
+      scriptSrcAttr:  ["'unsafe-inline'"],
+      styleSrc:       ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       imgSrc:         ["'self'", "data:", "https:"],
       connectSrc:     ["'self'"],
-      fontSrc:        ["'self'", "https:", "data:"],
+      fontSrc:        ["'self'", "https://fonts.gstatic.com", "https:", "data:"],
       objectSrc:      ["'none'"],
       frameAncestors: ["'none'"],
     },
