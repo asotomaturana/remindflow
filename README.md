@@ -1,125 +1,196 @@
-# RemindFlow v4.1.0
+# RemindFlow v4.3.1
 
-Sistema de gestión para community managers — Sotoro Management.
+A production web application for client and content management, built for a community manager.
+Used as a live QA laboratory — demonstrating test planning, API testing, automation, and formal QA documentation.
 
-## Novedades v4.1
-- **Bug fix crítico**: login fallaba en el segundo intento (loadCfg no se llamaba al inicio)
-- Módulo de credenciales de redes sociales con cifrado AES-256-GCM
-- Dashboard manual de estadísticas por plataforma (preparado para Meta API)
+**Live:** https://remindflow-production.up.railway.app  
+**Stack:** Node.js · Express · SQLite · JWT · SendGrid · Twilio · Railway  
 
-## Novedades v4.0
-- Módulo de Propuestas de servicio con importación desde Excel/CSV
-- Log de auditoría completo de todas las acciones del sistema
-- Registro automático de respuestas de clientes via webhook Twilio
-- Gestión de materiales audiovisuales con estructura de carpetas
-- UUIDs en todas las entidades del sistema
+---
 
-## Estructura del proyecto
+## QA Portfolio
+
+This repository contains a complete QA verification cycle for v4.3.1, including:
+
+| Artefact | Location |
+|---|---|
+| Test Plan | [`docs/RemindFlow_Test_Plan_v1.md`](docs/RemindFlow_Test_Plan_v1.md) |
+| Test Cases (28 cases) | [`docs/RemindFlow_Casos_Prueba_v1.md`](docs/RemindFlow_Casos_Prueba_v1.md) |
+| QA Execution Report | [`docs/RemindFlow_QA_Reporte_Ejecucion_v1.md`](docs/RemindFlow_QA_Reporte_Ejecucion_v1.md) |
+| Traceability Matrix | [`docs/RemindFlow_Traceability_Matrix_v1.md`](docs/RemindFlow_Traceability_Matrix_v1.md) |
+| QA Metrics Report | [`docs/RemindFlow_QA_Metricas_v1.md`](docs/RemindFlow_QA_Metricas_v1.md) |
+| QA Closure Document | [`docs/RemindFlow_QA_Cierre_v4.3.1.md`](docs/RemindFlow_QA_Cierre_v4.3.1.md) |
+| Postman Collection | [`postman/RemindFlow_API.postman_collection.json`](postman/RemindFlow_API.postman_collection.json) |
+| Newman HTML Report | [`docs/evidence/v4.3.1/newman/newman_report_w2.html`](docs/evidence/v4.3.1/newman/newman_report_w2.html) |
+| Evidence Files | [`docs/evidence/v4.3.1/`](docs/evidence/v4.3.1/) |
+| API Testing Manifesto | [`docs/API_Testing_Manifesto_v1.md`](docs/API_Testing_Manifesto_v1.md) |
+
+### QA Results — v4.3.1
+
+- **71 / 71 Newman assertions passing** — 0 failures
+- **28 test cases** across 6 findings
+- **100% pass rate** on fully verifiable cases
+- **95.5% endpoint coverage**
+- **6 security and reliability findings verified** in production
+
+---
+
+## Application Overview
+
+RemindFlow is a CRM-style tool built for community managers. It manages clients, scheduled messages, social media credentials, and audit logs. All data operations are authenticated via JWT.
+
+### Key Features
+
+- Client management with full CRUD
+- Gmail email sending via SendGrid API
+- WhatsApp messaging via Twilio
+- Scheduled message delivery with retry logic (backoff: 5min × 3, then 20min × 3)
+- Social media credential tracking (access type — no passwords stored)
+- Audit log for all system actions
+- Twilio webhook with signature validation
+- Content Security Policy (Phase 1)
+- JWT authentication — RFC 7519 compliant, 8-hour expiry
+
+---
+
+## Project Structure
 
 ```
-remindflow_v40/
-├── index.html              ← Frontend completo (bug fix login)
-├── server.js               ← Backend Express v4.1
-├── schema.sql              ← DDL para PostgreSQL/SQLite
+remindflow/
+├── server.js               ← Express server — entry point
+├── store.js                ← SQLite data layer (better-sqlite3)
+├── schema.sql              ← Database schema
 ├── package.json
 ├── .env.example
-├── .gitignore
-├── CHANGELOG.md
-├── README.md
-├── uploads/                ← Materiales de clientes (se crea automáticamente)
-│   └── {clientId}/
-│       └── {year}/{month}/{timestamp}_{filename}
-├── data/store.js           ← Store en memoria con UUID
-├── middleware/auth.js      ← JWT + API Key
+├── index.html              ← Frontend (Vanilla JS — monolithic)
+├── middleware/
+│   └── auth.js             ← JWT verification middleware
 ├── routes/
-│   ├── auth.js             ← Login/logout/me
-│   ├── clients.js
-│   ├── tasks.js
-│   ├── messages.js
-│   ├── acuerdos.js
-│   ├── contenido.js
-│   ├── propuestas.js       ← Propuestas + import-excel
-│   ├── audit.js            ← Log de auditoría
-│   ├── respuestas.js       ← Respuestas + webhook Twilio
-│   ├── materiales.js       ← Subida y gestión de archivos
-│   ├── credenciales.js     ← NEW v4.1: credenciales cifradas AES-256
-│   └── estadisticas.js     ← NEW v4.1: dashboard de métricas sociales
-└── services/
-    ├── gmail.js
-    ├── whatsapp.js
-    ├── scheduler.js
-    └── cipher.js           ← NEW v4.1: servicio AES-256-GCM
+│   ├── auth.js             ← POST /auth/login, GET /auth/me
+│   ├── clients.js          ← /api/clients — full CRUD
+│   ├── tasks.js            ← /api/tasks — full CRUD
+│   ├── messages.js         ← /api/messages — Gmail, WhatsApp, schedule
+│   ├── credenciales.js     ← /api/credenciales — access type tracking
+│   ├── respuestas.js       ← /webhooks/twilio — incoming webhook
+│   ├── audit.js            ← /api/audit — audit log
+│   └── ...
+├── services/
+│   ├── gmail.js            ← SendGrid API integration
+│   ├── whatsapp.js         ← Twilio WhatsApp integration
+│   ├── scheduler.js        ← Cron-based message scheduler with retry
+│   └── cipher.js           ← AES-256-GCM encryption service
+├── tests/
+│   └── login.spec.js       ← Playwright E2E test
+├── postman/
+│   └── RemindFlow_API.postman_collection.json  ← 20 requests, 71 assertions
+└── docs/
+    ├── evidence/v4.3.1/    ← QA evidence — screenshots and reports
+    └── *.md                ← QA documents
 ```
 
-## Instalación
+---
+
+## API Overview
+
+All endpoints under `/api/` require `Authorization: Bearer <token>`.
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/auth/login` | Authenticate — returns JWT |
+| GET | `/auth/me` | Current user info |
+| GET / POST | `/api/clients` | List / create clients |
+| GET / PUT / DELETE | `/api/clients/:id` | Get / update / delete client |
+| GET / POST | `/api/tasks` | List / create tasks |
+| GET / PUT / DELETE | `/api/tasks/:id` | Get / update / delete task |
+| POST | `/api/messages/gmail` | Send email via SendGrid |
+| POST | `/api/messages/whatsapp` | Send WhatsApp via Twilio |
+| GET / POST | `/api/messages/schedule` | List / create scheduled messages |
+| GET / POST | `/api/credenciales` | List / create credential records |
+| DELETE | `/api/credenciales/:id` | Delete credential record |
+| GET | `/api/audit` | Audit log |
+| GET | `/health` | Server health and version |
+| POST | `/webhooks/twilio/webhook-twilio` | Incoming WhatsApp webhook |
+
+---
+
+## Running Locally
 
 ```bash
+git clone https://github.com/asotomaturana/remindflow.git
+cd remindflow
 npm install
 cp .env.example .env
-# Editar .env con tus credenciales
+# Edit .env with your credentials
 npm start
 ```
 
-## Variables de entorno (.env)
+### Environment Variables
 
 ```env
 PORT=3000
 APP_USERNAME=admin
-APP_PASSWORD=tu_contraseña
-JWT_SECRET=texto_largo_aleatorio
-CIPHER_SECRET=genera_con_comando_abajo
-GMAIL_USER=sotoroadmin@gmail.com
-GMAIL_APP_PASSWORD=xxxx xxxx xxxx xxxx
-GMAIL_FROM_NAME=Sotoro Management
+APP_PASSWORD=your_password
+JWT_SECRET=long_random_string
+CIPHER_SECRET=generate_with_command_below
+SENDGRID_API_KEY=your_sendgrid_key
+SENDGRID_FROM=your_verified_sender@gmail.com
 TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxx
 TWILIO_AUTH_TOKEN=xxxxxxxxxxxxxxxxxxxxxxxx
 TWILIO_WHATSAPP_FROM=whatsapp:+14155238886
-API_SECRET_KEY=clave_opcional
+TWILIO_WEBHOOK_URL=https://your-server/webhooks/twilio/webhook-twilio
 ```
 
-Generar CIPHER_SECRET:
+Generate CIPHER_SECRET:
 ```bash
 node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
-## Credenciales de redes sociales (AES-256-GCM)
+---
 
-- Las contraseñas se cifran con AES-256-GCM antes de almacenarse en memoria
-- Nunca se exponen en el listado de credenciales
-- Para revelar: botón "Mostrar" en el frontend → requiere contraseña de admin
-- Cada intento de reveal queda registrado en el log de auditoría
+## Running Tests
 
-## Dashboard de estadísticas
-
-Métricas por plataforma y período: seguidores totales, nuevos seguidores, alcance,
-impresiones, likes, comentarios, guardados, compartidos, vistas (Reels/video),
-publicaciones del período. Tasa de engagement calculada automáticamente.
-
-Campo `source: 'manual'` — preparado para cambiar a `'meta_api'` cuando el acceso
-a Meta Graph API esté aprobado.
-
-## API v4.1 — Rutas nuevas
-
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET/POST | /api/credenciales | Credenciales de RRSS (sin passwords) |
-| PUT/DELETE | /api/credenciales/:id | Actualizar/eliminar credencial |
-| POST | /api/credenciales/:id/reveal | Revelar contraseña (requiere adminPassword) |
-| GET/POST | /api/estadisticas | Estadísticas de RRSS |
-| GET | /api/estadisticas/resumen | Resumen por plataforma (último período) |
-| PUT/DELETE | /api/estadisticas/:id | Corregir/eliminar registro |
-
-## Webhook Twilio
-
-En console.twilio.com → Messaging → Sandbox → "When a message comes in":
-- URL: `https://tu-servidor.railway.app/webhooks/twilio/webhook-twilio`
-- Method: `POST`
-
-## Migrar a PostgreSQL
+### Playwright (E2E)
 
 ```bash
-createdb remindflow
-psql remindflow < schema.sql
-npm install pg
-# Reemplazar funciones de store.js por queries SQL
+npx playwright test
 ```
+
+### Newman (API regression)
+
+```bash
+newman run postman/RemindFlow_API.postman_collection.json \
+  -e postman/RemindFlow_Produccion.postman_environment.json
+```
+
+Expected: 71 assertions, 0 failures.
+
+---
+
+## Deployment
+
+Deployed on Railway via Docker. Database persisted on Railway Volume at `/app/data/remindflow.db`.
+
+CI/CD: GitHub Actions — Playwright tests run on every push to master.
+
+---
+
+## Known Technical Debt
+
+| ID | Description |
+|---|---|
+| B-GMAIL-01 | Migrate SendGrid to Gmail OAuth2 |
+| H-05 Phase 2 | CSP strict mode — requires index.html refactoring |
+| DAT-001 | POST /api/clients does not validate duplicates |
+| DAT-003 | DELETE returns 500 instead of 409 on active client |
+
+Open issues tracked on the [GitHub Issues](https://github.com/asotomaturana/remindflow/issues) board.
+
+---
+
+## Author
+
+**Alejandro Soto Maturana**  
+QA Engineer · 15+ years in banking QA (Banco de Chile, Nexus Chile)  
+Transitioning to test automation — Playwright, Postman, Newman, GitHub Actions  
+
+[LinkedIn](https://linkedin.com/in/alejandro-soto-2209141b2) · [GitHub](https://github.com/asotomaturana)
